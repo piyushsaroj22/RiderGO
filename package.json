@@ -1,13 +1,14 @@
 {
   "name": "ridergo",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "backend"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+    "dev:rider": "npm run dev -w rider-web",
+    "dev:driver": "npm run dev -w driver-web",
+    "dev:admin": "npm run dev -w admin-web",
+    "dev:backend": "npm run dev -w backend"
+  }
 }
