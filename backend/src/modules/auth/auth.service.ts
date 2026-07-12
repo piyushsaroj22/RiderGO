@@ -1,12 +1,18 @@
 import bcrypt from "bcrypt";
 import AppError from "../../utils/AppError.js";
 import UserModel from "../user/user.model.js";
-
-interface RegisterUserInput {
-  name: string;
-  email: string;
-  password: string;
-}
+import { Response } from "express";
+// import env from "../../config/env.js";
+import { generateToken } from "../../utils/jwt.js";
+import { setAuthCookie } from "../../utils/cookie.js";
+import EmailVerificationModel from "../emailVerification/emailVerification.model.js";
+import { sendVerificationEmail } from "../emailVerification/emailVerification.service.js";
+import {
+  RegisterUserInput,
+  LoginUserInput,
+  LoginUserResponse,
+  VerifyUserEmailResponse,
+} from "./auth.types.js";
 
 export const registerUser = async ({
   name,
@@ -37,13 +43,113 @@ export const registerUser = async ({
 
   await user.save();
 
+  await sendVerificationEmail(user._id.toString(), user.name, user.email);
+
   return {
     success: true,
-    message: "Registration successful",
+    message: "Registration successful. Please verify your email.",
     data: {
-      id: user._id,
+      id: user._id.toString(),
       name: user.name,
       email: user.email,
+    },
+  };
+};
+
+export const verifyUserEmail = async (
+  token: string,
+  res: Response,
+): Promise<VerifyUserEmailResponse> => {
+  const verificationToken = await EmailVerificationModel.findOne({
+    token,
+  });
+
+  if (!verificationToken) {
+    throw new AppError("Invalid verification token", 400);
+  }
+
+  if (verificationToken.expiresAt < new Date()) {
+    await EmailVerificationModel.deleteOne({
+      _id: verificationToken._id,
+    });
+
+    throw new AppError("Verification token has expired", 400);
+  }
+
+  const user = await UserModel.findById(verificationToken.user);
+
+  if (!user) {
+    throw new AppError("User not found", 404);
+  }
+
+  user.isEmailVerified = true;
+
+  await user.save();
+
+  await EmailVerificationModel.deleteOne({
+    _id: verificationToken._id,
+  });
+
+  const jwtToken = generateToken(user._id.toString());
+
+  setAuthCookie(res, jwtToken);
+
+  return {
+    success: true,
+    message: "Email verified successfully",
+    data: {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
+    },
+  };
+};
+
+export const loginUser = async (
+  { email, password }: LoginUserInput,
+  res: Response,
+): Promise<LoginUserResponse> => {
+  // Validate required fields
+  if (!email || !password) {
+    throw new AppError("Email and password are required", 400);
+  }
+
+  // Find user
+  const user = await UserModel.findOne({ email });
+
+  // Invalid credentials
+  if (!user) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
+  // Compare password
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordValid) {
+    throw new AppError("Invalid email or password", 401);
+  }
+
+  // Check email verification
+  if (!user.isEmailVerified) {
+    throw new AppError("Please verify your email before logging in", 403);
+  }
+
+  // Generate JWT
+  const jwtToken = generateToken(user._id.toString());
+
+  // Set Cookie
+  setAuthCookie(res, jwtToken);
+
+  // Return response
+  return {
+    success: true,
+    message: "Login successful",
+    data: {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      isEmailVerified: user.isEmailVerified,
     },
   };
 };
