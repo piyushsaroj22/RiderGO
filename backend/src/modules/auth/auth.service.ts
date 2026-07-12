@@ -153,3 +153,10 @@ export const loginUser = async (
     },
   };
 };
+
+export const logoutUser = async () => {
+  return {
+    success: true,
+    message: "Logout successful",
+  };
+};

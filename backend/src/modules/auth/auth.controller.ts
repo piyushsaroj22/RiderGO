@@ -1,5 +1,11 @@
 import asyncHandler from "../../utils/asyncHandler.js";
-import { registerUser, verifyUserEmail, loginUser } from "./auth.service.js";
+import { clearAuthCookie } from "../../utils/cookie.js";
+import {
+  registerUser,
+  verifyUserEmail,
+  loginUser,
+  logoutUser,
+} from "./auth.service.js";
 
 export const register = asyncHandler(async (req, res) => {
   const result = await registerUser(req.body);
@@ -17,6 +23,14 @@ export const verifyEmail = asyncHandler(async (req, res) => {
 
 export const login = asyncHandler(async (req, res) => {
   const result = await loginUser(req.body, res);
+
+  res.status(200).json(result);
+});
+
+export const logout = asyncHandler(async (req, res) => {
+  const result = await logoutUser();
+
+  clearAuthCookie(res);
 
   res.status(200).json(result);
 });
