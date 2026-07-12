@@ -26,6 +26,11 @@ const userSchema = new Schema(
       default: "",
     },
 
+    profileImagePublicId: {
+      type: String,
+      default: "",
+    },
+
     isEmailVerified: {
       type: Boolean,
       default: false,
