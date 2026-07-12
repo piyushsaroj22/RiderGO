@@ -5,6 +5,7 @@ import {
   verifyUserEmail,
   loginUser,
   logoutUser,
+  getCurrentUser,
 } from "./auth.service.js";
 
 export const register = asyncHandler(async (req, res) => {
@@ -31,6 +32,12 @@ export const logout = asyncHandler(async (req, res) => {
   const result = await logoutUser();
 
   clearAuthCookie(res);
+
+  res.status(200).json(result);
+});
+
+export const me = asyncHandler(async (req, res) => {
+  const result = await getCurrentUser(req.user!);
 
   res.status(200).json(result);
 });

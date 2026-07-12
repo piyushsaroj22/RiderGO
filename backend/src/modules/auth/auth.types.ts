@@ -43,3 +43,14 @@ export interface AuthResponse {
   message: string;
   data: AuthUserData;
 }
+
+export interface GetCurrentUserResponse {
+  success: boolean;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+    profileImage: string;
+    isEmailVerified: boolean;
+  };
+}

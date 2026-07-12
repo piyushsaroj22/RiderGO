@@ -2,11 +2,13 @@ import bcrypt from "bcrypt";
 import AppError from "../../utils/AppError.js";
 import UserModel from "../user/user.model.js";
 import { Response } from "express";
-// import env from "../../config/env.js";
 import { generateToken } from "../../utils/jwt.js";
 import { setAuthCookie } from "../../utils/cookie.js";
 import EmailVerificationModel from "../emailVerification/emailVerification.model.js";
 import { sendVerificationEmail } from "../emailVerification/emailVerification.service.js";
+import { HydratedDocument } from "mongoose";
+import { GetCurrentUserResponse } from "./auth.types.js";
+import { User } from "../user/user.model.js";
 import {
   RegisterUserInput,
   LoginUserInput,
@@ -158,5 +160,20 @@ export const logoutUser = async () => {
   return {
     success: true,
     message: "Logout successful",
+  };
+};
+
+export const getCurrentUser = async (
+  user: HydratedDocument<User>,
+): Promise<GetCurrentUserResponse> => {
+  return {
+    success: true,
+    data: {
+      id: user._id.toString(),
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage,
+      isEmailVerified: user.isEmailVerified,
+    },
   };
 };
