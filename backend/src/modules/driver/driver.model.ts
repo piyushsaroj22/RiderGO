@@ -86,11 +86,53 @@ const driverSchema = new Schema(
       type: String,
       default: "",
     },
+
+    currentLocation: {
+      type: {
+        type: String,
+        enum: ["Point"],
+        default: "Point",
+      },
+
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        default: [0, 0],
+      },
+
+      lastUpdated: {
+        type: Date,
+        default: null,
+      },
+    },
+
+    isAvailable: {
+      type: Boolean,
+      default: false,
+    },
+    pendingPenalty: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,
   },
 );
+
+driverSchema.index({
+  currentLocation: "2dsphere",
+});
+
+driverSchema.index({
+  isAvailable: 1,
+  vehicleType: 1,
+});
+
+driverSchema.index({
+  isOnline: 1,
+  isAvailable: 1,
+});
 
 export type Driver = InferSchemaType<typeof driverSchema>;
 

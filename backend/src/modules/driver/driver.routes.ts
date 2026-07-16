@@ -13,6 +13,7 @@ import {
   updateLicenseImage,
   updateRcImage,
   updateVehicleImage,
+  updateLocation,
 } from "./driver.controller.js";
 
 const router = Router();
@@ -23,6 +24,7 @@ router.post("/logout", protectRoute, authorize("Driver"), logout);
 router.get("/me", protectRoute, authorize("Driver"), me);
 router.get("/profile", protectRoute, authorize("Driver"), getProfile);
 router.patch("/profile", protectRoute, authorize("Driver"), updateProfile);
+router.patch("/location", protectRoute, authorize("Driver"), updateLocation);
 router.patch(
   "/profile-image",
   protectRoute,

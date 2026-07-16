@@ -35,6 +35,12 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
+    pendingCancellationFee: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
   },
   {
     timestamps: true,

@@ -1,5 +1,7 @@
 import asyncHandler from "../../utils/asyncHandler.js";
 import { clearAuthCookie } from "../../utils/cookie.js";
+import { HydratedDocument } from "mongoose";
+import { User } from "../user/user.model.js";
 import {
   registerUser,
   verifyUserEmail,
@@ -37,7 +39,7 @@ export const logout = asyncHandler(async (req, res) => {
 });
 
 export const me = asyncHandler(async (req, res) => {
-  const result = await getCurrentUser(req.account!);
+  const result = await getCurrentUser(req.account as HydratedDocument<User>);
 
   res.status(200).json(result);
 });

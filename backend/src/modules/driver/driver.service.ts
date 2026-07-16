@@ -18,6 +18,8 @@ import {
   GetDriverProfileResponse,
   UpdateDriverProfileInput,
   UpdateDriverProfileResponse,
+  UpdateDriverLocationInput,
+  UpdateDriverLocationResponse,
 } from "./driver.types.js";
 
 export const registerDriver = async ({
@@ -250,10 +252,7 @@ export const updateDriverProfileImage = async (
     publicIdField: "profileImagePublicId",
   });
 
-  return buildDriverImageResponse(
-    driver,
-    "Profile image updated successfully",
-  );
+  return buildDriverImageResponse(driver, "Profile image updated successfully");
 };
 
 export const updateDriverLicenseImage = async (
@@ -272,10 +271,7 @@ export const updateDriverLicenseImage = async (
     publicIdField: "licenseImagePublicId",
   });
 
-  return buildDriverImageResponse(
-    driver,
-    "License image updated successfully",
-  );
+  return buildDriverImageResponse(driver, "License image updated successfully");
 };
 
 export const updateDriverRcImage = async (
@@ -294,10 +290,7 @@ export const updateDriverRcImage = async (
     publicIdField: "rcImagePublicId",
   });
 
-  return buildDriverImageResponse(
-    driver,
-    "RC image updated successfully",
-  );
+  return buildDriverImageResponse(driver, "RC image updated successfully");
 };
 
 export const updateDriverVehicleImage = async (
@@ -316,8 +309,27 @@ export const updateDriverVehicleImage = async (
     publicIdField: "vehicleImagePublicId",
   });
 
-  return buildDriverImageResponse(
-    driver,
-    "Vehicle image updated successfully",
-  );
+  return buildDriverImageResponse(driver, "Vehicle image updated successfully");
+};
+
+export const updateDriverLocation = async (
+  driver: HydratedDocument<Driver>,
+  { latitude, longitude }: UpdateDriverLocationInput,
+): Promise<UpdateDriverLocationResponse> => {
+  if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
+    throw new AppError("Invalid coordinates", 400);
+  }
+
+  driver.currentLocation = {
+    type: "Point",
+    coordinates: [longitude, latitude],
+    lastUpdated: new Date(),
+  };
+
+  await driver.save();
+
+  return {
+    success: true,
+    message: "Location updated successfully",
+  };
 };

@@ -108,3 +108,13 @@ export interface UpdateDriverImageResponse {
     isOnline: boolean;
   };
 }
+
+export interface UpdateDriverLocationInput {
+  latitude: number;
+  longitude: number;
+}
+
+export interface UpdateDriverLocationResponse {
+  success: boolean;
+  message: string;
+}

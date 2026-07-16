@@ -12,6 +12,7 @@ import {
   updateDriverLicenseImage,
   updateDriverRcImage,
   updateDriverVehicleImage,
+  updateDriverLocation,
 } from "./driver.service.js";
 
 export const register = asyncHandler(async (req, res) => {
@@ -90,6 +91,15 @@ export const updateVehicleImage = asyncHandler(async (req, res) => {
   const result = await updateDriverVehicleImage(
     req.account as HydratedDocument<Driver>,
     req.file,
+  );
+
+  res.status(200).json(result);
+});
+
+export const updateLocation = asyncHandler(async (req, res) => {
+  const result = await updateDriverLocation(
+    req.account as HydratedDocument<Driver>,
+    req.body,
   );
 
   res.status(200).json(result);
