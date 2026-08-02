@@ -11,17 +11,20 @@ import { getRouteDetails } from "../../services/maps.service.js";
 import { CreateRideInput, CreateRideResponse } from "./ride.types.js";
 // import { findNearbyDrivers } from "../../services/driverMatching.service.js";
 import { Driver } from "../driver/driver.model.js";
+
 import {
   getPendingRideOffer,
   acceptRideOffer,
   rejectRideOffer,
   expireAllRideOffers,
 } from "../rideOffer/rideOffer.service.js";
+
 import {
   dispatchRide,
   assignRideToDriver,
   dispatchNextDriver,
 } from "../../services/dispatch.service.js";
+
 import {
   emitRideAccepted,
   emitDriverArrived,
@@ -30,6 +33,7 @@ import {
   emitRideCompleted,
   emitRideCancelled,
 } from "../../sockets/socket.events.js";
+
 import {
   GetDriverRideResponse,
   DriverArrivedResponse,
@@ -45,6 +49,8 @@ import {
   RideHistoryResponse,
   RideHistoryItem,
   RideDetailsResponse,
+  // PaymentStatus,
+  // RideStatus,
 } from "./ride.types.js";
 
 export const createRide = async (

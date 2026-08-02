@@ -24,7 +24,7 @@ export const findNearbyDrivers = async ({
         query: {
           isOnline: true,
           isAvailable: true,
-          isApproved: true,
+          verificationStatus: "APPROVED",
           isEmailVerified: true,
         },
       },

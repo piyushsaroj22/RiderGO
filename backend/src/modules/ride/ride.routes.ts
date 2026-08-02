@@ -21,30 +21,30 @@ const router = Router();
 
 router.use(protectRoute); // Apply protectRoute middleware to all routes
 
-router.post("/", authorize("User"), create);
+router.post("/", authorize(["User"]), create);
 
-router.get("/driver", authorize("Driver"), driverRide);
+router.get("/driver", authorize(["Driver"]), driverRide);
 
-router.patch("/:rideId/arrived", authorize("Driver"), arrived);
+router.patch("/:rideId/arrived", authorize(["Driver"]), arrived);
 
-router.get("/history", authorize("User"), userRideHistory);
+router.get("/history", authorize(["User"]), userRideHistory);
 
-router.get("/driver/history", authorize("Driver"), driverRideHistory);
+router.get("/driver/history", authorize(["Driver"]), driverRideHistory);
 
-router.get("/:rideId", authorize("User", "Driver"), rideDetails);
+router.get("/:rideId", authorize(["User", "Driver"]), rideDetails);
 
-router.patch("/:rideId/verify-otp", authorize("Driver"), verifyOtp);
+router.patch("/:rideId/verify-otp", authorize(["Driver"]), verifyOtp);
 
-router.patch("/:rideId/accept", authorize("Driver"), accept);
+router.patch("/:rideId/accept", authorize(["Driver"]), accept);
 
-router.patch("/:rideId/reject", authorize("Driver"), reject);
+router.patch("/:rideId/reject", authorize(["Driver"]), reject);
 
-router.patch("/:rideId/start", authorize("Driver"), start);
+router.patch("/:rideId/start", authorize(["Driver"]), start);
 
-router.patch("/:rideId/complete", authorize("Driver"), complete);
+router.patch("/:rideId/complete", authorize(["Driver"]), complete);
 
-router.patch("/:rideId/cancel", authorize("User"), cancelByUser);
+router.patch("/:rideId/cancel", authorize(["User"]), cancelByUser);
 
-router.patch("/:rideId/driver-cancel", authorize("Driver"), cancelByDriver);
+router.patch("/:rideId/driver-cancel", authorize(["Driver"]), cancelByDriver);
 
 export default router;

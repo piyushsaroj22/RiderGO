@@ -15,13 +15,15 @@ import {
   LoginUserInput,
   LoginUserResponse,
   VerifyUserEmailResponse,
+  RegisterUserResponse,
+  LogoutUserResponse,
 } from "./auth.types.js";
 
 export const registerUser = async ({
   name,
   email,
   password,
-}: RegisterUserInput) => {
+}: RegisterUserInput): Promise<RegisterUserResponse> => {
   // Validate required fields
   if (!name || !email || !password) {
     throw new AppError("All fields are required", 400);
@@ -171,7 +173,7 @@ export const loginUser = async (
   };
 };
 
-export const logoutUser = async () => {
+export const logoutUser = async (): Promise<LogoutUserResponse> => {
   return {
     success: true,
     message: "Logout successful",

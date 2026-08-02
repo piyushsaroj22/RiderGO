@@ -20,15 +20,15 @@ const router = Router();
 
 router.post("/register", register);
 router.post("/login", login);
-router.post("/logout", protectRoute, authorize("Driver"), logout);
-router.get("/me", protectRoute, authorize("Driver"), me);
-router.get("/profile", protectRoute, authorize("Driver"), getProfile);
-router.patch("/profile", protectRoute, authorize("Driver"), updateProfile);
-router.patch("/location", protectRoute, authorize("Driver"), updateLocation);
+router.post("/logout", protectRoute, authorize(["Driver"]), logout);
+router.get("/me", protectRoute, authorize(["Driver"]), me);
+router.get("/profile", protectRoute, authorize(["Driver"]), getProfile);
+router.patch("/profile", protectRoute, authorize(["Driver"]), updateProfile);
+router.patch("/location", protectRoute, authorize(["Driver"]), updateLocation);
 router.patch(
   "/profile-image",
   protectRoute,
-  authorize("Driver"),
+  authorize(["Driver"]),
   upload.single("profileImage"),
   updateProfileImage,
 );
@@ -36,7 +36,7 @@ router.patch(
 router.patch(
   "/license-image",
   protectRoute,
-  authorize("Driver"),
+  authorize(["Driver"]),
   upload.single("licenseImage"),
   updateLicenseImage,
 );
@@ -44,7 +44,7 @@ router.patch(
 router.patch(
   "/rc-image",
   protectRoute,
-  authorize("Driver"),
+  authorize(["Driver"]),
   upload.single("rcImage"),
   updateRcImage,
 );
@@ -52,7 +52,7 @@ router.patch(
 router.patch(
   "/vehicle-image",
   protectRoute,
-  authorize("Driver"),
+  authorize(["Driver"]),
   upload.single("vehicleImage"),
   updateVehicleImage,
 );

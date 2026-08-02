@@ -61,6 +61,11 @@ reviewSchema.index(
   },
 );
 
+reviewSchema.index({
+  reviewee: 1,
+  createdAt: -1,
+});
+
 const ReviewModel = model<Review>("Review", reviewSchema);
 
 export default ReviewModel;

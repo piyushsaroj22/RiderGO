@@ -34,7 +34,7 @@ export interface LoginDriverResponse {
     vehicleType: string;
     profileImage: string;
     isEmailVerified: boolean;
-    isApproved: boolean;
+    verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
   };
 }
@@ -49,7 +49,7 @@ export interface GetCurrentDriverResponse {
     vehicleType: string;
     profileImage: string;
     isEmailVerified: boolean;
-    isApproved: boolean;
+    verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
   };
 }
@@ -64,7 +64,7 @@ export interface GetDriverProfileResponse {
     vehicleType: string;
     profileImage: string;
     isEmailVerified: boolean;
-    isApproved: boolean;
+    verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
   };
 }
@@ -85,7 +85,7 @@ export interface UpdateDriverProfileResponse {
     vehicleType: string;
     profileImage: string;
     isEmailVerified: boolean;
-    isApproved: boolean;
+    verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
   };
 }
@@ -104,7 +104,7 @@ export interface UpdateDriverImageResponse {
     rcImage: string;
     vehicleImage: string;
     isEmailVerified: boolean;
-    isApproved: boolean;
+    verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
   };
 }

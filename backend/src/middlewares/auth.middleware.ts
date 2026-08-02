@@ -3,8 +3,10 @@ import AppError from "../utils/AppError.js";
 import { verifyToken } from "../utils/jwt.js";
 import UserModel from "../modules/user/user.model.js";
 import DriverModel from "../modules/driver/driver.model.js";
-// future
-// import AdminModel from "../modules/admin/admin.model.js";
+import AdminModel from "../modules/admin/admin.model.js";
+import type { UserDocument } from "../modules/user/user.model.js";
+import type { DriverDocument } from "../modules/driver/driver.model.js";
+import type { AdminDocument } from "../modules/admin/admin.model.js";
 
 export const protectRoute = async (
   req: Request,
@@ -19,7 +21,7 @@ export const protectRoute = async (
 
   const decoded = verifyToken(token);
 
-  let account = null;
+  let account: UserDocument | DriverDocument | AdminDocument | null = null;
 
   switch (decoded.accountType) {
     case "User":
@@ -30,9 +32,9 @@ export const protectRoute = async (
       account = await DriverModel.findById(decoded.accountId);
       break;
 
-    // case "Admin":
-    //   account = await AdminModel.findById(decoded.accountId);
-    //   break;
+    case "Admin":
+      account = await AdminModel.findById(decoded.accountId);
+      break;
 
     default:
       return next(new AppError("Invalid account type", 401));

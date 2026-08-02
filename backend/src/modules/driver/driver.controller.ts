@@ -15,19 +15,46 @@ import {
   updateDriverLocation,
 } from "./driver.service.js";
 
-export const register = asyncHandler(async (req, res) => {
+import { ParamsDictionary } from "express-serve-static-core";
+
+import {
+  RegisterDriverInput,
+  RegisterDriverResponse,
+  LoginDriverInput,
+  LoginDriverResponse,
+  GetCurrentDriverResponse,
+  GetDriverProfileResponse,
+  UpdateDriverProfileInput,
+  UpdateDriverProfileResponse,
+  UpdateDriverImageResponse,
+  UpdateDriverLocationInput,
+  UpdateDriverLocationResponse,
+} from "./driver.types.js";
+
+export const register = asyncHandler<
+  ParamsDictionary,
+  RegisterDriverResponse,
+  RegisterDriverInput
+>(async (req, res) => {
   const result = await registerDriver(req.body);
 
   res.status(201).json(result);
 });
 
-export const login = asyncHandler(async (req, res) => {
+export const login = asyncHandler<
+  ParamsDictionary,
+  LoginDriverResponse,
+  LoginDriverInput
+>(async (req, res) => {
   const result = await loginDriver(req.body, res);
 
   res.status(200).json(result);
 });
 
-export const logout = asyncHandler(async (req, res) => {
+export const logout = asyncHandler<
+  ParamsDictionary,
+  { success: boolean; message: string }
+>(async (req, res) => {
   res.clearCookie("token");
 
   const result = logoutDriver();
@@ -35,15 +62,20 @@ export const logout = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const me = asyncHandler(async (req, res) => {
-  const result = await getCurrentDriver(
-    req.account as HydratedDocument<Driver>,
-  );
+export const me = asyncHandler<ParamsDictionary, GetCurrentDriverResponse>(
+  async (req, res) => {
+    const result = await getCurrentDriver(
+      req.account as HydratedDocument<Driver>,
+    );
 
-  res.status(200).json(result);
-});
+    res.status(200).json(result);
+  },
+);
 
-export const getProfile = asyncHandler(async (req, res) => {
+export const getProfile = asyncHandler<
+  ParamsDictionary,
+  GetDriverProfileResponse
+>(async (req, res) => {
   const result = await getDriverProfile(
     req.account as HydratedDocument<Driver>,
   );
@@ -51,7 +83,11 @@ export const getProfile = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const updateProfile = asyncHandler(async (req, res) => {
+export const updateProfile = asyncHandler<
+  ParamsDictionary,
+  UpdateDriverProfileResponse,
+  UpdateDriverProfileInput
+>(async (req, res) => {
   const result = await updateDriverProfile(
     req.account as HydratedDocument<Driver>,
     req.body,
@@ -60,7 +96,10 @@ export const updateProfile = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const updateProfileImage = asyncHandler(async (req, res) => {
+export const updateProfileImage = asyncHandler<
+  ParamsDictionary,
+  UpdateDriverImageResponse
+>(async (req, res) => {
   const result = await updateDriverProfileImage(
     req.account as HydratedDocument<Driver>,
     req.file,
@@ -69,7 +108,10 @@ export const updateProfileImage = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const updateLicenseImage = asyncHandler(async (req, res) => {
+export const updateLicenseImage = asyncHandler<
+  ParamsDictionary,
+  UpdateDriverImageResponse
+>(async (req, res) => {
   const result = await updateDriverLicenseImage(
     req.account as HydratedDocument<Driver>,
     req.file,
@@ -78,7 +120,10 @@ export const updateLicenseImage = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const updateRcImage = asyncHandler(async (req, res) => {
+export const updateRcImage = asyncHandler<
+  ParamsDictionary,
+  UpdateDriverImageResponse
+>(async (req, res) => {
   const result = await updateDriverRcImage(
     req.account as HydratedDocument<Driver>,
     req.file,
@@ -87,7 +132,10 @@ export const updateRcImage = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const updateVehicleImage = asyncHandler(async (req, res) => {
+export const updateVehicleImage = asyncHandler<
+  ParamsDictionary,
+  UpdateDriverImageResponse
+>(async (req, res) => {
   const result = await updateDriverVehicleImage(
     req.account as HydratedDocument<Driver>,
     req.file,
@@ -96,7 +144,11 @@ export const updateVehicleImage = asyncHandler(async (req, res) => {
   res.status(200).json(result);
 });
 
-export const updateLocation = asyncHandler(async (req, res) => {
+export const updateLocation = asyncHandler<
+  ParamsDictionary,
+  UpdateDriverLocationResponse,
+  UpdateDriverLocationInput
+>(async (req, res) => {
   const result = await updateDriverLocation(
     req.account as HydratedDocument<Driver>,
     req.body,

@@ -2,6 +2,8 @@ export type VehicleType = "Bike" | "Auto" | "Car";
 
 export type PaymentMethod = "Cash" | "UPI" | "Card";
 
+export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
+
 export type RideStatus =
   | "SEARCHING"
   | "NO_DRIVER_FOUND"
@@ -50,8 +52,8 @@ export interface CreateRideResponse {
     distance: number;
     duration: number;
     paymentMethod: PaymentMethod;
-    paymentStatus: string;
-    status: string;
+    paymentStatus: PaymentStatus;
+    status: RideStatus;
   };
 }
 
@@ -75,8 +77,8 @@ export interface GetDriverRideResponse {
     distance: number;
     duration: number;
     paymentMethod: PaymentMethod;
-    paymentStatus: string;
-    status: string;
+    paymentStatus: PaymentStatus;
+    status: RideStatus;
   };
 }
 
@@ -85,7 +87,7 @@ export interface DriverArrivedResponse {
   message: string;
   data: {
     id: string;
-    status: string;
+    status: RideStatus;
   };
 }
 
@@ -98,7 +100,7 @@ export interface VerifyRideOtpResponse {
   message: string;
   data: {
     id: string;
-    status: string;
+    status: RideStatus;
   };
 }
 
@@ -117,7 +119,7 @@ export interface StartRideResponse {
   message: string;
   data: {
     id: string;
-    status: string;
+    status: RideStatus;
   };
 }
 
@@ -126,8 +128,8 @@ export interface CompleteRideResponse {
   message: string;
   data: {
     id: string;
-    status: string;
-    paymentStatus: string;
+    status: RideStatus;
+    paymentStatus: PaymentStatus;
   };
 }
 
@@ -162,7 +164,7 @@ export interface RideHistoryItem {
   distance: number;
   duration: number;
   paymentMethod: PaymentMethod;
-  paymentStatus: string;
+  paymentStatus: PaymentStatus;
   status: RideStatus;
   createdAt: Date;
 }
@@ -196,7 +198,7 @@ export interface RideDetailsResponse {
     distance: number;
     duration: number;
     paymentMethod: PaymentMethod;
-    paymentStatus: "PENDING" | "PAID" | "FAILED";
+    paymentStatus: PaymentStatus;
     status: RideStatus;
     cancellationFee: number;
     cancellationReason: string;

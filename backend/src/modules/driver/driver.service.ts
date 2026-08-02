@@ -103,8 +103,15 @@ export const loginDriver = async (
   }
 
   // Approval check
-  if (!driver.isApproved) {
+  if (driver.verificationStatus === "PENDING") {
     throw new AppError("Your account is under review", 403);
+  }
+
+  if (driver.verificationStatus === "REJECTED") {
+    throw new AppError(
+      `Your verification was rejected. ${driver.rejectionReason}`,
+      403,
+    );
   }
 
   // Generate JWT
@@ -124,7 +131,7 @@ export const loginDriver = async (
       vehicleType: driver.vehicleType,
       profileImage: driver.profileImage,
       isEmailVerified: driver.isEmailVerified,
-      isApproved: driver.isApproved,
+      verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
     },
   };
@@ -150,7 +157,7 @@ export const getCurrentDriver = async (
       vehicleType: driver.vehicleType,
       profileImage: driver.profileImage,
       isEmailVerified: driver.isEmailVerified,
-      isApproved: driver.isApproved,
+      verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
     },
   };
@@ -169,7 +176,7 @@ export const getDriverProfile = async (
       vehicleType: driver.vehicleType,
       profileImage: driver.profileImage,
       isEmailVerified: driver.isEmailVerified,
-      isApproved: driver.isApproved,
+      verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
     },
   };
@@ -207,7 +214,7 @@ export const updateDriverProfile = async (
       vehicleType: driver.vehicleType,
       profileImage: driver.profileImage,
       isEmailVerified: driver.isEmailVerified,
-      isApproved: driver.isApproved,
+      verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
     },
   };
@@ -231,7 +238,7 @@ const buildDriverImageResponse = (
     rcImage: driver.rcImage,
     vehicleImage: driver.vehicleImage,
     isEmailVerified: driver.isEmailVerified,
-    isApproved: driver.isApproved,
+    verificationStatus: driver.verificationStatus,
     isOnline: driver.isOnline,
   },
 });

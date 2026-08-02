@@ -1,4 +1,4 @@
-import { HydratedDocument } from "mongoose";
+import { HydratedDocument, Types } from "mongoose";
 import AppError from "../../utils/AppError.js";
 import RideModel from "../ride/ride.model.js";
 import ReviewModel from "./review.model.js";
@@ -9,6 +9,7 @@ import {
   CreateReviewResponse,
   GetReviewsResponse,
   GetReviewSummaryResponse,
+  ReviewItem,
 } from "./review.types.js";
 
 export const createReview = async (
@@ -112,6 +113,36 @@ export const createReview = async (
   };
 };
 
+//
+
+const mapReviewToDto = (review: {
+  _id: Types.ObjectId;
+  reviewer: {
+    _id: Types.ObjectId;
+    name: string;
+    profileImage: string;
+  };
+  reviewerType: "User" | "Driver";
+  rating: number;
+  comment?: string;
+  createdAt: Date;
+}): ReviewItem => ({
+  id: review._id.toString(),
+
+  reviewer: {
+    id: review.reviewer._id.toString(),
+    type: review.reviewerType,
+    name: review.reviewer.name,
+    profileImage: review.reviewer.profileImage,
+  },
+
+  rating: review.rating,
+  comment: review.comment ?? "",
+  createdAt: review.createdAt,
+});
+
+//
+
 export const getDriverReviews = async (
   driverId: string,
 ): Promise<GetReviewsResponse> => {
@@ -119,10 +150,18 @@ export const getDriverReviews = async (
     reviewee: driverId,
     revieweeType: "Driver",
   })
-    .populate("reviewer", "fullName profileImage")
+    .populate<{
+      reviewer: {
+        _id: Types.ObjectId;
+        name: string;
+        profileImage: string;
+      };
+    }>("reviewer", "name profileImage")
     .sort({ createdAt: -1 });
 
-  return { reviews };
+  return {
+    reviews: reviews.map(mapReviewToDto),
+  };
 };
 
 export const getUserReviews = async (
@@ -132,10 +171,18 @@ export const getUserReviews = async (
     reviewee: userId,
     revieweeType: "User",
   })
-    .populate("reviewer", "fullName profileImage")
+    .populate<{
+      reviewer: {
+        _id: Types.ObjectId;
+        name: string;
+        profileImage: string;
+      };
+    }>("reviewer", "name profileImage")
     .sort({ createdAt: -1 });
 
-  return { reviews };
+  return {
+    reviews: reviews.map(mapReviewToDto),
+  };
 };
 
 export const getDriverReviewSummary = async (

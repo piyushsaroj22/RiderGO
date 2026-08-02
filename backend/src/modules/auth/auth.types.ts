@@ -15,6 +15,16 @@ export interface RegisterUserInput {
   password: string;
 }
 
+export interface RegisterUserResponse {
+  success: boolean;
+  message: string;
+  data: {
+    id: string;
+    name: string;
+    email: string;
+  };
+}
+
 export interface LoginUserInput {
   email: string;
   password: string;
@@ -53,4 +63,9 @@ export interface GetCurrentUserResponse {
     profileImage: string;
     isEmailVerified: boolean;
   };
+}
+
+export interface LogoutUserResponse {
+  success: boolean;
+  message: string;
 }

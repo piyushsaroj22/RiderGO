@@ -1,4 +1,4 @@
-import { Schema, model, InferSchemaType } from "mongoose";
+import { Schema, model, InferSchemaType, HydratedDocument } from "mongoose";
 
 const driverSchema = new Schema(
   {
@@ -41,9 +41,26 @@ const driverSchema = new Schema(
       default: false,
     },
 
-    isApproved: {
-      type: Boolean,
-      default: false,
+    verificationStatus: {
+      type: String,
+      enum: ["PENDING", "APPROVED", "REJECTED"],
+      default: "PENDING",
+    },
+
+    rejectionReason: {
+      type: String,
+      default: "",
+    },
+
+    approvedAt: {
+      type: Date,
+      default: null,
+    },
+
+    verifiedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Admin",
+      default: null,
     },
 
     isOnline: {
@@ -149,6 +166,7 @@ driverSchema.index({
 });
 
 export type Driver = InferSchemaType<typeof driverSchema>;
+export type DriverDocument = HydratedDocument<Driver>;
 
 const DriverModel = model<Driver>("Driver", driverSchema);
 

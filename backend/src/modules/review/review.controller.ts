@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import asyncHandler from "../../utils/asyncHandler.js";
 import AppError from "../../utils/AppError.js";
-// import { DriverParams, UserParams } from "./review.types.js";
+import { HydratedDocument } from "mongoose";
+import { User } from "../user/user.model.js";
+import { Driver } from "../driver/driver.model.js";
 import {
   createReview,
   getDriverReviews,
@@ -16,7 +18,11 @@ export const createReviewController = asyncHandler(
       throw new AppError("Invalid account type.", 403);
     }
 
-    const result = await createReview(req.account!, req.accountType, req.body);
+    const result = await createReview(
+      req.account as HydratedDocument<User> | HydratedDocument<Driver>,
+      req.accountType,
+      req.body,
+    );
 
     res.status(201).json(result);
   },

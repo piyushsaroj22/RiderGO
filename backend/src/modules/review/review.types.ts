@@ -11,6 +11,9 @@ export interface Review {
 
   rating: number;
   comment?: string;
+
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface CreateReviewInput {
@@ -24,18 +27,23 @@ export interface CreateReviewResponse {
 }
 
 export interface GetReviewsResponse {
-  reviews: Review[];
+  reviews: ReviewItem[];
+}
+
+export interface ReviewItem {
+  id: string;
+  reviewer: {
+    id: string;
+    type: "User" | "Driver";
+    name: string;
+    profileImage: string;
+  };
+  rating: number;
+  comment: string;
+  createdAt: Date;
 }
 
 export interface GetReviewSummaryResponse {
   averageRating: number;
   totalRatings: number;
 }
-
-// export interface DriverParams {
-//   driverId: string;
-// }
-
-// export interface UserParams {
-//   userId: string;
-// }
