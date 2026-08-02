@@ -109,3 +109,106 @@ export interface LogoutAdminResponse {
   success: boolean;
   message: string;
 }
+
+export interface DriverListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  vehicleType: "Bike" | "Auto" | "Car";
+  verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
+  isBlocked: boolean;
+  isOnline: boolean;
+  averageRating: number;
+  totalRatings: number;
+  createdAt: Date;
+}
+
+export interface BlockDriverInput {
+  reason: string;
+}
+
+export interface BlockDriverResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface UnblockDriverResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface GetDriversQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  verificationStatus?: "PENDING" | "APPROVED" | "REJECTED";
+  isBlocked?: boolean;
+  vehicleType?: "Bike" | "Auto" | "Car";
+  sortBy?: "createdAt" | "averageRating" | "totalRatings";
+  sortOrder?: "asc" | "desc";
+}
+
+export interface DriverListItem {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  vehicleType: "Bike" | "Auto" | "Car";
+  verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
+  isBlocked: boolean;
+  isOnline: boolean;
+  averageRating: number;
+  totalRatings: number;
+  createdAt: Date;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  totalItems: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
+}
+
+export interface GetDriversResponse {
+  success: boolean;
+  data: {
+    drivers: DriverListItem[];
+    pagination: Pagination;
+  };
+}
+
+export interface DriverFilter {
+  $or?: {
+    name?: {
+      $regex: string;
+      $options: string;
+    };
+
+    email?: {
+      $regex: string;
+      $options: string;
+    };
+
+    phone?: {
+      $regex: string;
+      $options: string;
+    };
+  }[];
+  verificationStatus?: DriverVerificationStatus;
+  isBlocked?: boolean;
+  vehicleType?: "Bike" | "Auto" | "Car";
+}
+
+export interface GetDriversQueryParams {
+  page?: string;
+  limit?: string;
+  search?: string;
+  verificationStatus?: DriverVerificationStatus;
+  isBlocked?: "true" | "false";
+  vehicleType?: "Bike" | "Auto" | "Car";
+  sortBy?: "createdAt" | "averageRating" | "totalRatings";
+  sortOrder?: "asc" | "desc";
+}

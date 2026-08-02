@@ -47,6 +47,27 @@ const driverSchema = new Schema(
       default: "PENDING",
     },
 
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
+
+    blockedAt: {
+      type: Date,
+      default: null,
+    },
+
+    blockedBy: {
+      type: Schema.Types.ObjectId,
+      ref: "Admin",
+      default: null,
+    },
+
+    blockReason: {
+      type: String,
+      default: "",
+    },
+
     rejectionReason: {
       type: String,
       default: "",

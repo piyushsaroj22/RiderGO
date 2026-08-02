@@ -1,11 +1,12 @@
 import { Types } from "mongoose";
+// import type { FilterQuery } from "mongoose";
 import bcrypt from "bcrypt";
 import { Response } from "express";
 import AppError from "../../utils/AppError.js";
 import { generateToken } from "../../utils/jwt.js";
 import { setAuthCookie } from "../../utils/cookie.js";
 import AdminModel from "./admin.model.js";
-import DriverModel from "../driver/driver.model.js";
+import DriverModel, { Driver } from "../driver/driver.model.js";
 import { HydratedDocument } from "mongoose";
 import { Admin } from "./admin.model.js";
 import {
@@ -19,6 +20,9 @@ import {
   UpdateDriverVerificationInput,
   UpdateDriverVerificationResponse,
   LogoutAdminResponse,
+  GetDriversQuery,
+  GetDriversResponse,
+  DriverFilter,
 } from "./admin.types.js";
 
 export const registerAdmin = async (
@@ -266,5 +270,93 @@ export const updateDriverVerification = async (
   return {
     success: true,
     message: `Driver ${status.toLowerCase()} successfully.`,
+  };
+};
+
+export const getDrivers = async ({
+  page = 1,
+  limit = 20,
+  search,
+  verificationStatus,
+  isBlocked,
+  vehicleType,
+  sortBy = "createdAt",
+  sortOrder = "desc",
+}: GetDriversQuery): Promise<GetDriversResponse> => {
+  const filter: DriverFilter = {};
+
+  if (search?.trim()) {
+    filter.$or = [
+      {
+        name: {
+          $regex: search.trim(),
+          $options: "i",
+        },
+      },
+      {
+        email: {
+          $regex: search.trim(),
+          $options: "i",
+        },
+      },
+      {
+        phone: {
+          $regex: search.trim(),
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  if (verificationStatus) {
+    filter.verificationStatus = verificationStatus;
+  }
+
+  if (typeof isBlocked === "boolean") {
+    filter.isBlocked = isBlocked;
+  }
+
+  if (vehicleType) {
+    filter.vehicleType = vehicleType;
+  }
+
+  const skip = (page - 1) * limit;
+
+  const [drivers, totalItems] = await Promise.all([
+    DriverModel.find(filter)
+      .sort({
+        [sortBy]: sortOrder === "asc" ? 1 : -1,
+      })
+      .skip(skip)
+      .limit(limit),
+
+    DriverModel.countDocuments(filter),
+  ]);
+
+  return {
+    success: true,
+    data: {
+      drivers: drivers.map((driver) => ({
+        id: driver._id.toString(),
+        name: driver.name,
+        email: driver.email,
+        phone: driver.phone,
+        vehicleType: driver.vehicleType,
+        verificationStatus: driver.verificationStatus,
+        isBlocked: driver.isBlocked,
+        isOnline: driver.isOnline,
+        averageRating: driver.averageRating,
+        totalRatings: driver.totalRatings,
+        createdAt: driver.createdAt,
+      })),
+      pagination: {
+        page,
+        limit,
+        totalItems,
+        totalPages: Math.ceil(totalItems / limit),
+        hasNextPage: page * limit < totalItems,
+        hasPreviousPage: page > 1,
+      },
+    },
   };
 };

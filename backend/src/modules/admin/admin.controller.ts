@@ -10,6 +10,7 @@ import {
   getPendingDrivers,
   getDriverVerificationDetails,
   updateDriverVerification,
+  getDrivers,
 } from "./admin.service.js";
 
 import {
@@ -23,6 +24,9 @@ import {
   UpdateDriverVerificationInput,
   UpdateDriverVerificationResponse,
   LogoutAdminResponse,
+  GetDriversQuery,
+  GetDriversQueryParams,
+  GetDriversResponse,
 } from "./admin.types.js";
 
 type DriverIdParams = {
@@ -100,4 +104,34 @@ export const updateDriverVerificationController = asyncHandler<
   );
 
   res.status(200).json(response);
+});
+
+export const getDriversController = asyncHandler<
+  ParamsDictionary,
+  GetDriversResponse,
+  never,
+  GetDriversQueryParams
+>(async (req, res) => {
+  const queryParams: GetDriversQueryParams = req.query;
+
+  const query: GetDriversQuery = {
+    page: queryParams.page ? Number(queryParams.page) : 1,
+    limit: queryParams.limit ? Number(queryParams.limit) : 20,
+    search: queryParams.search,
+    verificationStatus: queryParams.verificationStatus,
+    isBlocked:
+      queryParams.isBlocked === "true"
+        ? true
+        : queryParams.isBlocked === "false"
+          ? false
+          : undefined,
+
+    vehicleType: queryParams.vehicleType,
+    sortBy: queryParams.sortBy ?? "createdAt",
+    sortOrder: queryParams.sortOrder ?? "desc",
+  };
+
+  const result = await getDrivers(query);
+
+  res.status(200).json(result);
 });

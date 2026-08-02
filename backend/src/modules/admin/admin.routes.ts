@@ -1,7 +1,16 @@
 import { Router } from "express";
 import { protectRoute } from "../../middlewares/auth.middleware.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
-import { register, login, logout, me } from "./admin.controller.js";
+import {
+  register,
+  login,
+  logout,
+  me,
+  getPendingDriversController,
+  getDriverVerificationDetailsController,
+  updateDriverVerificationController,
+  getDriversController,
+} from "./admin.controller.js";
 
 const router = Router();
 
@@ -9,5 +18,33 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", protectRoute, authorize(["Admin"]), logout);
 router.get("/me", protectRoute, authorize(["Admin"]), me);
+
+router.get(
+  "/drivers",
+  protectRoute,
+  authorize(["Admin"]),
+  getDriversController,
+);
+
+router.get(
+  "/drivers/pending",
+  protectRoute,
+  authorize(["Admin"]),
+  getPendingDriversController,
+);
+
+router.get(
+  "/drivers/:driverId",
+  protectRoute,
+  authorize(["Admin"]),
+  getDriverVerificationDetailsController,
+);
+
+router.patch(
+  "/drivers/:driverId/verification",
+  protectRoute,
+  authorize(["Admin"]),
+  updateDriverVerificationController,
+);
 
 export default router;
