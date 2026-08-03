@@ -12,6 +12,7 @@ import {
   getDriversController,
   blockDriverController,
   unblockDriverController,
+  getUsersController,
 } from "./admin.controller.js";
 
 const router = Router();
@@ -27,6 +28,8 @@ router.get(
   authorize(["Admin"]),
   getDriversController,
 );
+
+router.get("/users", protectRoute, authorize(["Admin"]), getUsersController);
 
 router.get(
   "/drivers/pending",

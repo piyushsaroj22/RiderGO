@@ -25,7 +25,10 @@ import {
   DriverFilter,
   BlockDriverInput,
   UpdateDriverBlockStatusResponse,
+  GetUsersQuery,
+  GetUsersResponse,
 } from "./admin.types.js";
+import UserModel from "../user/user.model.js";
 
 export const registerAdmin = async (
   { fullName, email, password }: RegisterAdminInput,
@@ -422,6 +425,69 @@ export const getDrivers = async ({
         totalPages: Math.ceil(totalItems / limit),
         hasNextPage: page * limit < totalItems,
         hasPreviousPage: page > 1,
+      },
+    },
+  };
+};
+
+export const getUsers = async ({
+  page = 1,
+  limit = 20,
+  search,
+  isBlocked,
+  sortBy = "createdAt",
+  sortOrder = "desc",
+}: GetUsersQuery): Promise<GetUsersResponse> => {
+  const filter: Record<string, unknown> = {};
+
+  if (search) {
+    filter.$or = [
+      {
+        name: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+      {
+        email: {
+          $regex: search,
+          $options: "i",
+        },
+      },
+    ];
+  }
+
+  if (typeof isBlocked === "boolean") {
+    filter.isBlocked = isBlocked;
+  }
+
+  const total = await UserModel.countDocuments(filter);
+
+  const users = await UserModel.find(filter)
+    .sort({
+      [sortBy]: sortOrder === "asc" ? 1 : -1,
+    })
+    .skip((page - 1) * limit)
+    .limit(limit);
+
+  return {
+    success: true,
+    data: {
+      users: users.map((user) => ({
+        id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        profileImage: user.profileImage,
+        averageRating: user.averageRating,
+        totalRatings: user.totalRatings,
+        isBlocked: user.isBlocked,
+        createdAt: user.createdAt,
+      })),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
     },
   };

@@ -12,6 +12,7 @@ import {
   updateDriverVerification,
   getDrivers,
   updateDriverBlockStatus,
+  getUsers,
 } from "./admin.service.js";
 
 import {
@@ -31,6 +32,9 @@ import {
   // DriverIdParams,
   UpdateDriverBlockStatusResponse,
   BlockDriverInput,
+  GetUsersQueryParams,
+  GetUsersQuery,
+  GetUsersResponse,
 } from "./admin.types.js";
 
 type DriverIdParams = {
@@ -136,6 +140,46 @@ export const getDriversController = asyncHandler<
   };
 
   const result = await getDrivers(query);
+
+  res.status(200).json(result);
+});
+
+export const getUsersController = asyncHandler<
+  ParamsDictionary,
+  GetUsersResponse,
+  unknown,
+  GetUsersQueryParams
+>(async (req, res) => {
+  const query: GetUsersQuery = {
+    page: req.query.page ? Number(req.query.page) : 1,
+
+    limit: req.query.limit ? Number(req.query.limit) : 20,
+
+    search: typeof req.query.search === "string" ? req.query.search : undefined,
+
+    isBlocked:
+      req.query.isBlocked === "true"
+        ? true
+        : req.query.isBlocked === "false"
+          ? false
+          : undefined,
+
+    sortBy:
+      req.query.sortBy === "name" ||
+      req.query.sortBy === "email" ||
+      req.query.sortBy === "createdAt" ||
+      req.query.sortBy === "averageRating" ||
+      req.query.sortBy === "totalRatings"
+        ? req.query.sortBy
+        : "createdAt",
+
+    sortOrder:
+      req.query.sortOrder === "asc" || req.query.sortOrder === "desc"
+        ? req.query.sortOrder
+        : "desc",
+  };
+
+  const result = await getUsers(query);
 
   res.status(200).json(result);
 });

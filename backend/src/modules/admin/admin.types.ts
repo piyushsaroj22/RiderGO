@@ -149,6 +149,55 @@ export interface GetDriversQuery {
   sortOrder?: "asc" | "desc";
 }
 
+export interface GetUsersQueryParams {
+  page?: string;
+  limit?: string;
+  search?: string;
+  isBlocked?: "true" | "false";
+  sortBy?: "name" | "email" | "createdAt" | "averageRating" | "totalRatings";
+  sortOrder?: "asc" | "desc";
+}
+
+export interface GetUsersQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  isBlocked?: boolean;
+  sortBy?: "name" | "email" | "createdAt" | "averageRating" | "totalRatings";
+  sortOrder?: "asc" | "desc";
+}
+
+export interface GetUsersResponse {
+  success: boolean;
+  data: {
+    users: {
+      id: string;
+      name: string;
+      email: string;
+      profileImage: string;
+      averageRating: number;
+      totalRatings: number;
+      isBlocked: boolean;
+      createdAt: Date;
+    }[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  };
+}
+
+export interface BlockUserInput {
+  reason: string;
+}
+
+export interface UpdateUserBlockStatusResponse {
+  success: boolean;
+  message: string;
+}
+
 export interface DriverListItem {
   id: string;
   name: string;
