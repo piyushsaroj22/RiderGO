@@ -21,6 +21,18 @@ const appealSchema = new Schema(
       maxlength: 1000,
     },
 
+    originalBlockReason: {
+      type: String,
+      required: true,
+      trim: true,
+      maxlength: 1000,
+    },
+
+    blockedAtSnapshot: {
+      type: Date,
+      default: null,
+    },
+
     status: {
       type: String,
       enum: ["PENDING", "APPROVED", "REJECTED"],

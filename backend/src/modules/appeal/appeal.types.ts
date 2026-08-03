@@ -46,8 +46,11 @@ export interface GetAdminAppealsResponse {
         id: string;
         name: string;
         email: string;
+        phone: string;
       };
       reason: string;
+      originalBlockReason: string;
+      blockedAtSnapshot: Date | null;
       status: "PENDING" | "APPROVED" | "REJECTED";
       adminResponse: string;
       createdAt: Date;
@@ -70,4 +73,8 @@ export interface ReviewAppealInput {
 export interface ReviewAppealResponse {
   success: boolean;
   message: string;
+}
+
+export interface ReviewAppealParams {
+  appealId: string;
 }
