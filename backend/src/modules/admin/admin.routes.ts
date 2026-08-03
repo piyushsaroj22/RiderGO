@@ -1,6 +1,13 @@
 import { Router } from "express";
 import { protectRoute } from "../../middlewares/auth.middleware.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
+
+import {
+  getAdminReviewsController,
+  getReviewDetailsController,
+  deleteReviewController,
+} from "../review/review.controller.js";
+
 import {
   register,
   login,
@@ -80,6 +87,27 @@ router.patch(
   protectRoute,
   authorize(["Admin"]),
   unblockUserController,
+);
+
+router.get(
+  "/reviews",
+  protectRoute,
+  authorize(["Admin"]),
+  getAdminReviewsController,
+);
+
+router.get(
+  "/reviews/:reviewId",
+  protectRoute,
+  authorize(["Admin"]),
+  getReviewDetailsController,
+);
+
+router.delete(
+  "/reviews/:reviewId",
+  protectRoute,
+  authorize(["Admin"]),
+  deleteReviewController,
 );
 
 export default router;
