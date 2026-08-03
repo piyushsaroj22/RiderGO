@@ -1,6 +1,7 @@
-import { Router } from "express";
-import { protectRoute } from "../../middlewares/auth.middleware.js";
+import { ensureDriverIsActive } from "../../middlewares/ensureDriverIsActive.middleware.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
+import { protectRoute } from "../../middlewares/auth.middleware.js";
+import { Router } from "express";
 import {
   create,
   driverRide,
@@ -25,7 +26,12 @@ router.post("/", authorize(["User"]), create);
 
 router.get("/driver", authorize(["Driver"]), driverRide);
 
-router.patch("/:rideId/arrived", authorize(["Driver"]), arrived);
+router.patch(
+  "/:rideId/arrived",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  arrived,
+);
 
 router.get("/history", authorize(["User"]), userRideHistory);
 
@@ -33,18 +39,48 @@ router.get("/driver/history", authorize(["Driver"]), driverRideHistory);
 
 router.get("/:rideId", authorize(["User", "Driver"]), rideDetails);
 
-router.patch("/:rideId/verify-otp", authorize(["Driver"]), verifyOtp);
+router.patch(
+  "/:rideId/verify-otp",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  verifyOtp,
+);
 
-router.patch("/:rideId/accept", authorize(["Driver"]), accept);
+router.patch(
+  "/:rideId/accept",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  accept,
+);
 
-router.patch("/:rideId/reject", authorize(["Driver"]), reject);
+router.patch(
+  "/:rideId/reject",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  reject,
+);
 
-router.patch("/:rideId/start", authorize(["Driver"]), start);
+router.patch(
+  "/:rideId/start",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  start,
+);
 
-router.patch("/:rideId/complete", authorize(["Driver"]), complete);
+router.patch(
+  "/:rideId/complete",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  complete,
+);
 
 router.patch("/:rideId/cancel", authorize(["User"]), cancelByUser);
 
-router.patch("/:rideId/driver-cancel", authorize(["Driver"]), cancelByDriver);
+router.patch(
+  "/:rideId/driver-cancel",
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  cancelByDriver,
+);
 
 export default router;

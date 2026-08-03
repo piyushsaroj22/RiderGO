@@ -133,6 +133,7 @@ export const loginDriver = async (
       isEmailVerified: driver.isEmailVerified,
       verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
+      isBlocked: driver.isBlocked,
     },
   };
 };
@@ -159,6 +160,7 @@ export const getCurrentDriver = async (
       isEmailVerified: driver.isEmailVerified,
       verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
+      isBlocked: driver.isBlocked,
     },
   };
 };
@@ -178,6 +180,7 @@ export const getDriverProfile = async (
       isEmailVerified: driver.isEmailVerified,
       verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
+      isBlocked: driver.isBlocked,
     },
   };
 };
@@ -216,6 +219,7 @@ export const updateDriverProfile = async (
       isEmailVerified: driver.isEmailVerified,
       verificationStatus: driver.verificationStatus,
       isOnline: driver.isOnline,
+      isBlocked: driver.isBlocked,
     },
   };
 };
@@ -240,6 +244,7 @@ const buildDriverImageResponse = (
     isEmailVerified: driver.isEmailVerified,
     verificationStatus: driver.verificationStatus,
     isOnline: driver.isOnline,
+    isBlocked: driver.isBlocked,
   },
 });
 

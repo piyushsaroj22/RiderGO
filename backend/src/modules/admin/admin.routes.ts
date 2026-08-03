@@ -10,6 +10,8 @@ import {
   getDriverVerificationDetailsController,
   updateDriverVerificationController,
   getDriversController,
+  blockDriverController,
+  unblockDriverController,
 } from "./admin.controller.js";
 
 const router = Router();
@@ -45,6 +47,20 @@ router.patch(
   protectRoute,
   authorize(["Admin"]),
   updateDriverVerificationController,
+);
+
+router.patch(
+  "/drivers/:driverId/block",
+  protectRoute,
+  authorize(["Admin"]),
+  blockDriverController,
+);
+
+router.patch(
+  "/drivers/:driverId/unblock",
+  protectRoute,
+  authorize(["Admin"]),
+  unblockDriverController,
 );
 
 export default router;

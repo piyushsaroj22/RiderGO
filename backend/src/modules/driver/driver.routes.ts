@@ -1,7 +1,8 @@
-import { Router } from "express";
+import { ensureDriverIsActive } from "../../middlewares/ensureDriverIsActive.middleware.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
 import { protectRoute } from "../../middlewares/auth.middleware.js";
 import upload from "../../middlewares/upload.middleware.js";
+import { Router } from "express";
 import {
   register,
   login,
@@ -24,7 +25,15 @@ router.post("/logout", protectRoute, authorize(["Driver"]), logout);
 router.get("/me", protectRoute, authorize(["Driver"]), me);
 router.get("/profile", protectRoute, authorize(["Driver"]), getProfile);
 router.patch("/profile", protectRoute, authorize(["Driver"]), updateProfile);
-router.patch("/location", protectRoute, authorize(["Driver"]), updateLocation);
+
+router.patch(
+  "/location",
+  protectRoute,
+  authorize(["Driver"]),
+  ensureDriverIsActive,
+  updateLocation,
+);
+
 router.patch(
   "/profile-image",
   protectRoute,

@@ -52,6 +52,13 @@ const driverSchema = new Schema(
       default: false,
     },
 
+    blockReason: {
+      type: String,
+      default: "",
+      trim: true,
+      maxlength: 500,
+    },
+
     blockedAt: {
       type: Date,
       default: null,
@@ -61,11 +68,6 @@ const driverSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "Admin",
       default: null,
-    },
-
-    blockReason: {
-      type: String,
-      default: "",
     },
 
     rejectionReason: {

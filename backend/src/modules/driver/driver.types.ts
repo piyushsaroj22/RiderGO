@@ -36,6 +36,7 @@ export interface LoginDriverResponse {
     isEmailVerified: boolean;
     verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
+    isBlocked: boolean;
   };
 }
 
@@ -51,6 +52,7 @@ export interface GetCurrentDriverResponse {
     isEmailVerified: boolean;
     verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
+    isBlocked: boolean;
   };
 }
 
@@ -66,6 +68,7 @@ export interface GetDriverProfileResponse {
     isEmailVerified: boolean;
     verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
+    isBlocked: boolean;
   };
 }
 
@@ -87,6 +90,7 @@ export interface UpdateDriverProfileResponse {
     isEmailVerified: boolean;
     verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
+    isBlocked: boolean;
   };
 }
 
@@ -106,6 +110,7 @@ export interface UpdateDriverImageResponse {
     isEmailVerified: boolean;
     verificationStatus: "PENDING" | "APPROVED" | "REJECTED";
     isOnline: boolean;
+    isBlocked: boolean;
   };
 }
 

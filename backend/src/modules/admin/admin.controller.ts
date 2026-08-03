@@ -11,6 +11,7 @@ import {
   getDriverVerificationDetails,
   updateDriverVerification,
   getDrivers,
+  updateDriverBlockStatus,
 } from "./admin.service.js";
 
 import {
@@ -27,6 +28,9 @@ import {
   GetDriversQuery,
   GetDriversQueryParams,
   GetDriversResponse,
+  // DriverIdParams,
+  UpdateDriverBlockStatusResponse,
+  BlockDriverInput,
 } from "./admin.types.js";
 
 type DriverIdParams = {
@@ -132,6 +136,38 @@ export const getDriversController = asyncHandler<
   };
 
   const result = await getDrivers(query);
+
+  res.status(200).json(result);
+});
+
+export const blockDriverController = asyncHandler<
+  DriverIdParams,
+  UpdateDriverBlockStatusResponse,
+  BlockDriverInput
+>(async (req, res) => {
+  const admin = req.account as HydratedDocument<Admin>;
+
+  const result = await updateDriverBlockStatus(
+    req.params.driverId,
+    admin._id.toString(),
+    true,
+    req.body,
+  );
+
+  res.status(200).json(result);
+});
+
+export const unblockDriverController = asyncHandler<
+  DriverIdParams,
+  UpdateDriverBlockStatusResponse
+>(async (req, res) => {
+  const admin = req.account as HydratedDocument<Admin>;
+
+  const result = await updateDriverBlockStatus(
+    req.params.driverId,
+    admin._id.toString(),
+    false,
+  );
 
   res.status(200).json(result);
 });

@@ -212,3 +212,18 @@ export interface GetDriversQueryParams {
   sortBy?: "createdAt" | "averageRating" | "totalRatings";
   sortOrder?: "asc" | "desc";
 }
+
+export interface BlockDriverInput {
+  reason: string;
+}
+
+export interface UnblockDriverInput {}
+
+export interface UpdateDriverBlockStatusResponse {
+  success: boolean;
+  message: string;
+}
+
+export interface DriverIdParams {
+  driverId: string;
+}

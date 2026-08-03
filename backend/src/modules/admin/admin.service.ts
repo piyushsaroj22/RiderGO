@@ -23,6 +23,8 @@ import {
   GetDriversQuery,
   GetDriversResponse,
   DriverFilter,
+  BlockDriverInput,
+  UpdateDriverBlockStatusResponse,
 } from "./admin.types.js";
 
 export const registerAdmin = async (
@@ -270,6 +272,70 @@ export const updateDriverVerification = async (
   return {
     success: true,
     message: `Driver ${status.toLowerCase()} successfully.`,
+  };
+};
+
+export const updateDriverBlockStatus = async (
+  driverId: string,
+  adminId: string,
+  isBlocked: boolean,
+  payload?: BlockDriverInput,
+): Promise<UpdateDriverBlockStatusResponse> => {
+  // Validate Driver ID
+  if (!Types.ObjectId.isValid(driverId)) {
+    throw new AppError("Invalid driver ID", 400);
+  }
+
+  // Find Driver
+  const driver = await DriverModel.findById(driverId);
+
+  if (!driver) {
+    throw new AppError("Driver not found", 404);
+  }
+
+  const reason = payload?.reason?.trim();
+
+  if (isBlocked) {
+    if (!reason) {
+      throw new AppError("Block reason is required.", 400);
+    }
+
+    if (reason.length < 10) {
+      throw new AppError(
+        "Block reason must be at least 10 characters long.",
+        400,
+      );
+    }
+  }
+
+  // Prevent unnecessary updates
+  if (driver.isBlocked === isBlocked) {
+    throw new AppError(
+      isBlocked ? "Driver is already blocked." : "Driver is already unblocked.",
+      400,
+    );
+  }
+
+  // Update status
+  if (isBlocked) {
+    driver.isBlocked = true;
+    driver.blockReason = reason!;
+    driver.blockedAt = new Date();
+    driver.blockedBy = new Types.ObjectId(adminId);
+  } else {
+    driver.isBlocked = false;
+    driver.blockReason = "";
+    driver.blockedAt = null;
+    driver.blockedBy = null;
+  }
+
+  await driver.save();
+
+  return {
+    success: true,
+    message: isBlocked
+      ? "Driver blocked successfully."
+      : "Driver unblocked successfully.",
   };
 };
 
