@@ -1,4 +1,5 @@
 import { ensureDriverIsActive } from "../../middlewares/ensureDriverIsActive.middleware.js";
+import { ensureUserIsActive } from "../../middlewares/ensureUserIsActive.middleware.js";
 import { authorize } from "../../middlewares/authorize.middleware.js";
 import { protectRoute } from "../../middlewares/auth.middleware.js";
 import { Router } from "express";
@@ -22,7 +23,7 @@ const router = Router();
 
 router.use(protectRoute); // Apply protectRoute middleware to all routes
 
-router.post("/", authorize(["User"]), create);
+router.post("/", authorize(["User"]), ensureUserIsActive, create);
 
 router.get("/driver", authorize(["Driver"]), driverRide);
 
@@ -33,7 +34,12 @@ router.patch(
   arrived,
 );
 
-router.get("/history", authorize(["User"]), userRideHistory);
+router.get(
+  "/history",
+  authorize(["User"]),
+  ensureUserIsActive,
+  userRideHistory,
+);
 
 router.get("/driver/history", authorize(["Driver"]), driverRideHistory);
 
@@ -74,7 +80,12 @@ router.patch(
   complete,
 );
 
-router.patch("/:rideId/cancel", authorize(["User"]), cancelByUser);
+router.patch(
+  "/:rideId/cancel",
+  authorize(["User"]),
+  ensureUserIsActive,
+  cancelByUser,
+);
 
 router.patch(
   "/:rideId/driver-cancel",

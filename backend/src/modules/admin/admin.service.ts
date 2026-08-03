@@ -27,6 +27,8 @@ import {
   UpdateDriverBlockStatusResponse,
   GetUsersQuery,
   GetUsersResponse,
+  BlockUserInput,
+  UpdateUserBlockStatusResponse,
 } from "./admin.types.js";
 import UserModel from "../user/user.model.js";
 
@@ -490,5 +492,65 @@ export const getUsers = async ({
         totalPages: Math.ceil(total / limit),
       },
     },
+  };
+};
+
+export const updateUserBlockStatus = async (
+  userId: string,
+  adminId: string,
+  isBlocked: boolean,
+  payload?: BlockUserInput,
+): Promise<UpdateUserBlockStatusResponse> => {
+  if (!Types.ObjectId.isValid(userId)) {
+    throw new AppError("Invalid user ID.", 400);
+  }
+
+  const user = await UserModel.findById(userId);
+
+  if (!user) {
+    throw new AppError("User not found.", 404);
+  }
+
+  const reason = payload?.reason?.trim();
+
+  if (isBlocked) {
+    if (!reason) {
+      throw new AppError("Block reason is required.", 400);
+    }
+
+    if (reason.length < 10) {
+      throw new AppError(
+        "Block reason must be at least 10 characters long.",
+        400,
+      );
+    }
+  }
+
+  if (user.isBlocked === isBlocked) {
+    throw new AppError(
+      isBlocked ? "User is already blocked." : "User is already unblocked.",
+      400,
+    );
+  }
+
+  if (isBlocked) {
+    user.isBlocked = true;
+    user.blockReason = reason!;
+    user.blockedAt = new Date();
+    user.blockedBy = new Types.ObjectId(adminId);
+  } else {
+    user.isBlocked = false;
+    user.blockReason = "";
+    user.blockedAt = null;
+    user.blockedBy = null;
+  }
+
+  await user.save();
+
+  return {
+    success: true,
+    message: isBlocked
+      ? "User blocked successfully."
+      : "User unblocked successfully.",
   };
 };

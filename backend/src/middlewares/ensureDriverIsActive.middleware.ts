@@ -21,7 +21,8 @@ export const ensureDriverIsActive = async (
 
   if (driver.isBlocked) {
     throw new AppError(
-      "Your account has been suspended. Please contact support.",
+      driver.blockReason ||
+        "Your account has been suspended. Please contact support.",
       403,
     );
   }

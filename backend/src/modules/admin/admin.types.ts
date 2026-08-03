@@ -272,7 +272,3 @@ export interface UpdateDriverBlockStatusResponse {
   success: boolean;
   message: string;
 }
-
-export interface DriverIdParams {
-  driverId: string;
-}

@@ -13,6 +13,7 @@ import {
   getDrivers,
   updateDriverBlockStatus,
   getUsers,
+  updateUserBlockStatus,
 } from "./admin.service.js";
 
 import {
@@ -35,10 +36,16 @@ import {
   GetUsersQueryParams,
   GetUsersQuery,
   GetUsersResponse,
+  BlockUserInput,
+  UpdateUserBlockStatusResponse,
 } from "./admin.types.js";
 
 type DriverIdParams = {
   driverId: string;
+};
+
+type UserIdParams = {
+  userId: string;
 };
 
 export const register = asyncHandler<
@@ -150,33 +157,22 @@ export const getUsersController = asyncHandler<
   unknown,
   GetUsersQueryParams
 >(async (req, res) => {
+  const queryParams: GetUsersQueryParams = req.query;
+
   const query: GetUsersQuery = {
-    page: req.query.page ? Number(req.query.page) : 1,
-
-    limit: req.query.limit ? Number(req.query.limit) : 20,
-
-    search: typeof req.query.search === "string" ? req.query.search : undefined,
+    page: queryParams.page ? Number(queryParams.page) : 1,
+    limit: queryParams.limit ? Number(queryParams.limit) : 20,
+    search: queryParams.search,
 
     isBlocked:
-      req.query.isBlocked === "true"
+      queryParams.isBlocked === "true"
         ? true
-        : req.query.isBlocked === "false"
+        : queryParams.isBlocked === "false"
           ? false
           : undefined,
 
-    sortBy:
-      req.query.sortBy === "name" ||
-      req.query.sortBy === "email" ||
-      req.query.sortBy === "createdAt" ||
-      req.query.sortBy === "averageRating" ||
-      req.query.sortBy === "totalRatings"
-        ? req.query.sortBy
-        : "createdAt",
-
-    sortOrder:
-      req.query.sortOrder === "asc" || req.query.sortOrder === "desc"
-        ? req.query.sortOrder
-        : "desc",
+    sortBy: queryParams.sortBy ?? "createdAt",
+    sortOrder: queryParams.sortOrder ?? "desc",
   };
 
   const result = await getUsers(query);
@@ -209,6 +205,38 @@ export const unblockDriverController = asyncHandler<
 
   const result = await updateDriverBlockStatus(
     req.params.driverId,
+    admin._id.toString(),
+    false,
+  );
+
+  res.status(200).json(result);
+});
+
+export const blockUserController = asyncHandler<
+  UserIdParams,
+  UpdateUserBlockStatusResponse,
+  BlockUserInput
+>(async (req, res) => {
+  const admin = req.account as HydratedDocument<Admin>;
+
+  const result = await updateUserBlockStatus(
+    req.params.userId,
+    admin._id.toString(),
+    true,
+    req.body,
+  );
+
+  res.status(200).json(result);
+});
+
+export const unblockUserController = asyncHandler<
+  UserIdParams,
+  UpdateUserBlockStatusResponse
+>(async (req, res) => {
+  const admin = req.account as HydratedDocument<Admin>;
+
+  const result = await updateUserBlockStatus(
+    req.params.userId,
     admin._id.toString(),
     false,
   );

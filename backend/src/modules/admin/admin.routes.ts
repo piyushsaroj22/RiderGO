@@ -13,6 +13,8 @@ import {
   blockDriverController,
   unblockDriverController,
   getUsersController,
+  blockUserController,
+  unblockUserController,
 } from "./admin.controller.js";
 
 const router = Router();
@@ -64,6 +66,20 @@ router.patch(
   protectRoute,
   authorize(["Admin"]),
   unblockDriverController,
+);
+
+router.patch(
+  "/users/:userId/block",
+  protectRoute,
+  authorize(["Admin"]),
+  blockUserController,
+);
+
+router.patch(
+  "/users/:userId/unblock",
+  protectRoute,
+  authorize(["Admin"]),
+  unblockUserController,
 );
 
 export default router;
