@@ -3,14 +3,14 @@ import env from "./config/env.js";
 import { createServer } from "http";
 import connectDatabase from "./config/database.js";
 import { initializeSocket } from "./sockets/socket.js";
-// import { startRideOfferTimeoutJob } from "./jobs/rideOfferTimeout.job.js";
+import { startRideOfferTimeoutJob } from "./jobs/rideOfferTimeout.job.js";
 import { cleanupExpiredVerificationUsers } from "./modules/emailVerification/emailVerification.cleanup.js";
 
 const startServer = async () => {
   try {
     await connectDatabase();
 
-    // startRideOfferTimeoutJob();
+    startRideOfferTimeoutJob();
 
     const httpServer = createServer(app);
 
