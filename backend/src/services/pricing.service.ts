@@ -1,4 +1,6 @@
+import BusinessSettingsModel from "../modules/businessSettings/businessSettings.model.js";
 import { VehicleType } from "../modules/ride/ride.types.js";
+import { BusinessSettings } from "../modules/businessSettings/businessSettings.types.js";
 
 interface CalculateFareInput {
   vehicleType: VehicleType;
@@ -6,33 +8,39 @@ interface CalculateFareInput {
   duration: number;
 }
 
-export const calculateFare = ({
+export const calculateFare = async ({
   vehicleType,
   distance,
   duration,
-}: CalculateFareInput): number => {
-  const baseFare = {
-    Bike: 30,
-    Auto: 50,
-    Car: 80,
+}: CalculateFareInput): Promise<number> => {
+  const settingsDocument = await BusinessSettingsModel.findOne();
+
+  if (!settingsDocument) {
+    throw new Error("Business settings not configured.");
+  }
+
+  const settings = settingsDocument.toObject() as BusinessSettings;
+
+  const vehiclePricingMap = {
+    Bike: settings.pricing.bike,
+    Auto: settings.pricing.auto,
+    Car: settings.pricing.car,
   };
 
-  const perKmRate = {
-    Bike: 10,
-    Auto: 15,
-    Car: 20,
-  };
-
-  const perMinuteRate = {
-    Bike: 1,
-    Auto: 2,
-    Car: 3,
-  };
+  const pricing = vehiclePricingMap[vehicleType];
 
   const fare =
-    baseFare[vehicleType] +
-    distance * perKmRate[vehicleType] +
-    duration * perMinuteRate[vehicleType];
+    pricing.baseFare + distance * pricing.perKm + duration * pricing.perMinute;
 
-  return Math.round(fare);
+  let finalFare = fare;
+
+  if (settings.peakHour.enabled) {
+    finalFare *= settings.peakHour.multiplier;
+  }
+
+  if (settings.trafficPricing.enabled) {
+    finalFare *= settings.trafficPricing.multiplier;
+  }
+
+  return Math.round(finalFare);
 };

@@ -83,18 +83,6 @@ if (!process.env.RIDE_OFFER_JOB_INTERVAL) {
   );
 }
 
-if (!process.env.USER_CANCELLATION_FEE) {
-  throw new Error(
-    "USER_CANCELLATION_FEE is not defined in the environment variables",
-  );
-}
-
-if (!process.env.DRIVER_CANCELLATION_PENALTY) {
-  throw new Error(
-    "DRIVER_CANCELLATION_PENALTY is not defined in the environment variables",
-  );
-}
-
 const env = {
   PORT: process.env.PORT,
   NODE_ENV: process.env.NODE_ENV,
@@ -119,9 +107,6 @@ const env = {
 
   RIDE_OFFER_TIMEOUT: process.env.RIDE_OFFER_TIMEOUT,
   RIDE_OFFER_JOB_INTERVAL: process.env.RIDE_OFFER_JOB_INTERVAL,
-
-  USER_CANCELLATION_FEE: process.env.USER_CANCELLATION_FEE,
-  DRIVER_CANCELLATION_PENALTY: process.env.DRIVER_CANCELLATION_PENALTY,
 };
 
 export default env;

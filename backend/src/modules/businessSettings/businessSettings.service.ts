@@ -17,9 +17,19 @@ const getOrCreateBusinessSettings = async () => {
   return settings;
 };
 
+const getBusinessSettingsDocument = async () => {
+  const settings = await BusinessSettingsModel.findOne();
+
+  if (!settings) {
+    throw new AppError("Business settings are not initialized.", 500);
+  }
+
+  return settings;
+};
+
 export const getBusinessSettings =
   async (): Promise<GetBusinessSettingsResponse> => {
-    const settings = await getOrCreateBusinessSettings();
+    const settings = await getBusinessSettingsDocument();
 
     return {
       success: true,
@@ -30,7 +40,7 @@ export const getBusinessSettings =
 export const updateBusinessSettings = async (
   input: UpdateBusinessSettingsInput,
 ): Promise<UpdateBusinessSettingsResponse> => {
-  const settings = await getOrCreateBusinessSettings();
+  const settings = await getBusinessSettingsDocument();
 
   const current = settings.toObject() as BusinessSettings;
 

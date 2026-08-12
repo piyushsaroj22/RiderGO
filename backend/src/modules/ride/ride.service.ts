@@ -11,6 +11,8 @@ import { getRouteDetails } from "../../services/maps.service.js";
 import { CreateRideInput, CreateRideResponse } from "./ride.types.js";
 // import { findNearbyDrivers } from "../../services/driverMatching.service.js";
 import { Driver } from "../driver/driver.model.js";
+import BusinessSettingsModel from "../businessSettings/businessSettings.model.js";
+import { BusinessSettings } from "../businessSettings/businessSettings.types.js";
 
 import {
   getPendingRideOffer,
@@ -79,7 +81,8 @@ export const createRide = async (
   const duration = route.duration;
 
   // Fare
-  const fare = calculateFare({
+  // const fare = calculateFare({
+  const fare = await calculateFare({
     vehicleType,
     distance,
     duration,
@@ -413,8 +416,19 @@ export const cancelRideByUser = async (
     throw new AppError("Unauthorized", 403);
   }
 
+  const settingsDocument = await BusinessSettingsModel.findOne();
+
+  if (!settingsDocument) {
+    throw new AppError("Business settings not configured.", 500);
+  }
+
+  const settings = settingsDocument.toObject() as BusinessSettings;
+
   // Free cancellation before driver accepts
-  if (ride.status === "SEARCHING") {
+  if (
+    settings.cancellation.freeCancellationBeforeDriverAccepts &&
+    ride.status === "SEARCHING"
+  ) {
     ride.status = "CANCELLED";
     ride.cancelledBy = "User";
     ride.cancelledAt = new Date();
@@ -437,10 +451,10 @@ export const cancelRideByUser = async (
     ride.cancelledBy = "User";
     ride.cancelledAt = new Date();
     ride.cancellationReason = reason;
-    ride.cancellationFee = Number(env.USER_CANCELLATION_FEE);
+    ride.cancellationFee = settings.cancellation.userFee;
     ride.dispatch.isDispatchCompleted = true;
 
-    rider.pendingCancellationFee += Number(env.USER_CANCELLATION_FEE);
+    rider.pendingCancellationFee += settings.cancellation.userFee;
 
     await rider.save();
 
@@ -489,12 +503,20 @@ export const cancelRideByDriver = async (
     throw new AppError("Unauthorized", 403);
   }
 
+  const settingsDocument = await BusinessSettingsModel.findOne();
+
+  if (!settingsDocument) {
+    throw new AppError("Business settings not configured.", 500);
+  }
+
+  const settings = settingsDocument.toObject() as BusinessSettings;
+
   if (ride.status !== "DRIVER_ASSIGNED" && ride.status !== "DRIVER_ARRIVED") {
     throw new AppError("Ride can no longer be cancelled", 400);
   }
 
   // Driver penalty
-  driver.pendingPenalty += Number(env.DRIVER_CANCELLATION_PENALTY);
+  driver.pendingPenalty += settings.cancellation.driverPenalty;
 
   driver.isAvailable = true;
 
