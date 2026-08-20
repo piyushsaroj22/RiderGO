@@ -83,6 +83,12 @@ if (!process.env.RIDE_OFFER_JOB_INTERVAL) {
   );
 }
 
+if (!process.env.GOOGLE_DEMO_MAPS_API_KEY) {
+  throw new Error(
+    "GOOGLE_DEMO_MAPS_API_KEY is not defined in the environment variables",
+  );
+}
+
 const env = {
   PORT: process.env.PORT,
   NODE_ENV: process.env.NODE_ENV,
@@ -107,6 +113,8 @@ const env = {
 
   RIDE_OFFER_TIMEOUT: process.env.RIDE_OFFER_TIMEOUT,
   RIDE_OFFER_JOB_INTERVAL: process.env.RIDE_OFFER_JOB_INTERVAL,
+
+  GOOGLE_DEMO_MAPS_API_KEY: process.env.GOOGLE_DEMO_MAPS_API_KEY,
 };
 
 export default env;
