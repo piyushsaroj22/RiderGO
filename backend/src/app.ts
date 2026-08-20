@@ -14,6 +14,7 @@ import reviewRoutes from "./modules/review/review.routes.js";
 import adminRoutes from "./modules/admin/admin.routes.js";
 import appealRoutes from "./modules/appeal/appeal.routes.js";
 import businessSettingsRoutes from "./modules/businessSettings/businessSettings.routes.js";
+import paymentRoutes from "./modules/payment/payment.routes.js";
 
 const app = express();
 
@@ -33,6 +34,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/appeals", appealRoutes);
 app.use("/api/business-settings", businessSettingsRoutes);
+app.use("/api/payments", paymentRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorMiddleware);
