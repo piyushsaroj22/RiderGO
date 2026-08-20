@@ -15,9 +15,17 @@ import adminRoutes from "./modules/admin/admin.routes.js";
 import appealRoutes from "./modules/appeal/appeal.routes.js";
 import businessSettingsRoutes from "./modules/businessSettings/businessSettings.routes.js";
 import paymentRoutes from "./modules/payment/payment.routes.js";
+import { razorpayWebhookController } from "./modules/payment/payment.webhook.controller.js";
 
 const app = express();
 
+app.use(
+  "/api/payments/webhook",
+  express.raw({
+    type: "application/json",
+  }),
+  razorpayWebhookController,
+);
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
