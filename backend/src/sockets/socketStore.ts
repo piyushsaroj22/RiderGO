@@ -16,8 +16,22 @@ export const addConnectedAccount = (account: ConnectedAccount) => {
 export const removeConnectedAccount = (
   accountType: string,
   accountId: string,
+  socketId: string,
 ) => {
-  connectedAccounts.delete(getKey(accountType, accountId));
+  const key = getKey(accountType, accountId);
+
+  const connectedAccount = connectedAccounts.get(key);
+
+  if (!connectedAccount) {
+    return;
+  }
+
+  // Do not remove a newer socket connection
+  if (connectedAccount.socketId !== socketId) {
+    return;
+  }
+
+  connectedAccounts.delete(key);
 };
 
 export const getConnectedAccount = (accountType: string, accountId: string) => {

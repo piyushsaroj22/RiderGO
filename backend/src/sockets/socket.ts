@@ -35,7 +35,11 @@ export const initializeSocket = (httpServer: HttpServer) => {
       socket.on("disconnect", () => {
         leaveAccountRoom(socket, account.accountType, account.accountId);
 
-        removeConnectedAccount(account.accountType, account.accountId);
+        removeConnectedAccount(
+          account.accountType,
+          account.accountId,
+          socket.id,
+        );
 
         console.log(
           `${account.accountType} disconnected: ${account.accountId}`,

@@ -48,29 +48,37 @@ export const processRazorpayWebhook = async (
     throw new AppError("Missing Razorpay event ID.", 400);
   }
 
-  const alreadyProcessed = await PaymentWebhookEventModel.findOne({
-    eventId,
-  });
-
-  if (alreadyProcessed) {
-    return;
-  }
-
   const payload = JSON.parse(
     rawBody.toString("utf-8"),
   ) as RazorpayWebhookPayload;
 
   const event = payload.event;
 
+  const existingEvent = await PaymentWebhookEventModel.findOne({
+    eventId,
+  });
+
+  if (existingEvent) {
+    return;
+  }
+
   if (
     event !== "payment.captured" &&
     event !== "payment.failed" &&
     event !== "order.paid"
   ) {
-    await PaymentWebhookEventModel.create({
-      eventId,
-      event,
-    });
+    try {
+      await PaymentWebhookEventModel.create({
+        eventId,
+        event,
+      });
+    } catch (error: any) {
+      if (error?.code === 11000) {
+        return;
+      }
+
+      throw error;
+    }
 
     return;
   }
@@ -130,8 +138,16 @@ export const processRazorpayWebhook = async (
     });
   }
 
-  await PaymentWebhookEventModel.create({
-    eventId,
-    event,
-  });
+  try {
+    await PaymentWebhookEventModel.create({
+      eventId,
+      event,
+    });
+  } catch (error: any) {
+    if (error?.code === 11000) {
+      return;
+    }
+
+    throw error;
+  }
 };
