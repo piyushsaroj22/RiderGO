@@ -80,3 +80,7 @@ export interface DriverLocationPayload {
 }
 
 // export type SocketAccountType = "User" | "Driver";
+
+export interface DriverDisconnectedPayload {
+  rideId: string;
+}

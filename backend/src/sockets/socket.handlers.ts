@@ -2,7 +2,7 @@ import { Socket } from "socket.io";
 import DriverModel from "../modules/driver/driver.model.js";
 import { SocketAccount } from "./socket.auth.js";
 import RideModel from "../modules/ride/ride.model.js";
-import { emitDriverLocation } from "./socket.events.js";
+import { emitDriverLocation, emitDriverDisconnected } from "./socket.events.js";
 import { DriverLocationPayload, DriverLocationEvent } from "./socket.types.js";
 
 export const registerSocketHandlers = (
@@ -72,9 +72,33 @@ export const registerSocketHandlers = (
   );
 
   socket.on("disconnect", async () => {
-    await DriverModel.findByIdAndUpdate(account.accountId, {
-      isOnline: false,
-      isAvailable: false,
-    });
+    try {
+      const activeRide = await RideModel.findOne({
+        driver: account.accountId,
+        status: {
+          $in: [
+            "DRIVER_ASSIGNED",
+            "DRIVER_ARRIVED",
+            "OTP_VERIFIED",
+            "IN_PROGRESS",
+          ],
+        },
+      });
+
+      await DriverModel.findByIdAndUpdate(account.accountId, {
+        isOnline: false,
+        isAvailable: false,
+      });
+
+      if (!activeRide) {
+        return;
+      }
+
+      emitDriverDisconnected(activeRide.rider.toString(), {
+        rideId: activeRide._id.toString(),
+      });
+    } catch (error) {
+      console.error("Driver disconnect handling failed:", error);
+    }
   });
 };

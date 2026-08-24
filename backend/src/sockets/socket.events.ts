@@ -9,6 +9,7 @@ import {
   RideCancelledPayload,
   DriverLocationPayload,
   DriverLocationEvent,
+  DriverDisconnectedPayload,
 } from "./socket.types.js";
 
 export const emitRideOffer = (driverId: string, payload: RideOfferPayload) => {
@@ -62,4 +63,11 @@ export const emitDriverLocation = (
   payload: DriverLocationEvent,
 ) => {
   getIO().to(`User:${userId}`).emit("driver:location", payload);
+};
+
+export const emitDriverDisconnected = (
+  userId: string,
+  payload: DriverDisconnectedPayload,
+) => {
+  getIO().to(`User:${userId}`).emit("driver:disconnected", payload);
 };
