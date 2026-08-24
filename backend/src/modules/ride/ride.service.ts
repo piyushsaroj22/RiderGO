@@ -433,13 +433,32 @@ export const cancelRideByUser = async (
     settings.cancellation.freeCancellationBeforeDriverAccepts &&
     ride.status === "SEARCHING"
   ) {
-    ride.status = "CANCELLED";
-    ride.cancelledBy = "User";
-    ride.cancelledAt = new Date();
-    ride.cancellationReason = reason;
-    ride.dispatch.isDispatchCompleted = true;
+    const cancelledRide = await RideModel.findOneAndUpdate(
+      {
+        _id: rideId,
+        rider: rider._id,
+        status: "SEARCHING",
+      },
+      {
+        $set: {
+          status: "CANCELLED",
+          cancelledBy: "User",
+          cancelledAt: new Date(),
+          cancellationReason: reason,
+          "dispatch.isDispatchCompleted": true,
+        },
+      },
+      {
+        new: true,
+      },
+    );
 
-    await ride.save();
+    if (!cancelledRide) {
+      throw new AppError(
+        "Ride state changed. Cancellation could not be completed.",
+        409,
+      );
+    }
 
     await expireAllRideOffers(rideId);
 
@@ -451,33 +470,55 @@ export const cancelRideByUser = async (
 
   // Cancellation after driver accepts
   if (ride.status === "DRIVER_ASSIGNED" || ride.status === "DRIVER_ARRIVED") {
-    ride.status = "CANCELLED";
-    ride.cancelledBy = "User";
-    ride.cancelledAt = new Date();
-    ride.cancellationReason = reason;
-    ride.cancellationFee = settings.cancellation.userFee;
-    ride.dispatch.isDispatchCompleted = true;
+    const driverId = ride.driver;
+
+    const cancelledRide = await RideModel.findOneAndUpdate(
+      {
+        _id: rideId,
+        rider: rider._id,
+        status: {
+          $in: ["DRIVER_ASSIGNED", "DRIVER_ARRIVED"],
+        },
+      },
+      {
+        $set: {
+          status: "CANCELLED",
+          driver: null,
+          cancelledBy: "User",
+          cancelledAt: new Date(),
+          cancellationReason: reason,
+          cancellationFee: settings.cancellation.userFee,
+          "dispatch.isDispatchCompleted": true,
+        },
+      },
+      {
+        new: true,
+      },
+    );
+
+    if (!cancelledRide) {
+      throw new AppError(
+        "Ride state changed. Cancellation could not be completed.",
+        409,
+      );
+    }
 
     rider.pendingCancellationFee += settings.cancellation.userFee;
 
     await rider.save();
 
-    if (ride.driver) {
-      await DriverModel.findByIdAndUpdate(ride.driver, {
+    if (driverId) {
+      await DriverModel.findByIdAndUpdate(driverId, {
         isAvailable: true,
       });
-
-      ride.driver = null;
     }
 
-    await ride.save();
-
-    emitRideCancelled(ride.rider.toString(), {
-      rideId: ride._id.toString(),
-      cancelledBy: ride.cancelledBy!,
-    });
-
     await expireAllRideOffers(rideId);
+
+    emitRideCancelled(cancelledRide.rider.toString(), {
+      rideId: cancelledRide._id.toString(),
+      cancelledBy: "User",
+    });
 
     return {
       success: true,
