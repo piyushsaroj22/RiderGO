@@ -29,13 +29,13 @@ The dependencies are defined in `backend/package.json`; there is no separate pac
 Copy the placeholder file to a local `.env` file and fill it with values for your environment:
 
 ```text
-cp .env.example .env
+cp .env.example
 ```
 
 On Windows PowerShell, the equivalent is:
 
 ```powershell
-Copy-Item .env.example .env
+Copy-Item .env.example
 ```
 
 Use [04-environment-variables.md](./04-environment-variables.md) for the complete variable list. Do not commit secrets or paste actual credentials into documentation. `dotenv.config()` loads the environment before validation; the exact resolution path is left to dotenv's default behavior.
