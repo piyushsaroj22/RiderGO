@@ -14,9 +14,21 @@ export const registerSocketHandlers = (
   }
 
   socket.on("driver:online", async () => {
+    const activeRide = await RideModel.findOne({
+      driver: account.accountId,
+      status: {
+        $in: [
+          "DRIVER_ASSIGNED",
+          "DRIVER_ARRIVED",
+          "OTP_VERIFIED",
+          "IN_PROGRESS",
+        ],
+      },
+    });
+
     await DriverModel.findByIdAndUpdate(account.accountId, {
       isOnline: true,
-      isAvailable: true,
+      isAvailable: !activeRide,
     });
   });
 
