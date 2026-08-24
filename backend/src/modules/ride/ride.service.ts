@@ -258,7 +258,11 @@ export const acceptRide = async (
     throw new AppError("Ride offer not found", 404);
   }
 
-  await acceptRideOffer(rideId, driver._id.toString());
+  const acceptedOffer = await acceptRideOffer(rideId, driver._id.toString());
+
+  if (!acceptedOffer) {
+    throw new AppError("Ride offer is no longer available", 409);
+  }
 
   await assignRideToDriver(rideId, driver._id);
 
@@ -489,7 +493,13 @@ export const cancelRideByDriver = async (
   rideId: string,
   { reason }: CancelRideInput,
 ): Promise<CancelRideByDriverResponse> => {
-  const ride = await RideModel.findById(rideId);
+  const ride = await RideModel.findOne({
+    _id: rideId,
+    driver: driver._id,
+    status: {
+      $in: ["DRIVER_ASSIGNED", "DRIVER_ARRIVED"],
+    },
+  });
 
   if (!ride) {
     throw new AppError("Ride not found", 404);
@@ -517,22 +527,46 @@ export const cancelRideByDriver = async (
 
   // Driver penalty
   driver.pendingPenalty += settings.cancellation.driverPenalty;
-
   driver.isAvailable = true;
+
+  const updatedRide = await RideModel.findOneAndUpdate(
+    {
+      _id: rideId,
+      driver: driver._id,
+      status: {
+        $in: ["DRIVER_ASSIGNED", "DRIVER_ARRIVED"],
+      },
+    },
+    {
+      $set: {
+        status: "SEARCHING",
+        driver: null,
+        cancelledBy: "Driver",
+        cancelledAt: new Date(),
+        cancellationReason: reason,
+        cancellationFee: settings.cancellation.driverPenalty,
+      },
+    },
+    {
+      new: true,
+    },
+  );
+
+  if (!updatedRide) {
+    throw new AppError(
+      "Ride state changed. Cancellation could not be completed.",
+      409,
+    );
+  }
 
   await driver.save();
 
-  ride.driver = null;
+  // Expire old pending offers
+  await expireAllRideOffers(rideId);
 
-  ride.status = "SEARCHING";
-
-  // ride.dispatch.currentDriverIndex++;
-
-  await ride.save();
-
-  emitRideCancelled(ride.rider.toString(), {
-    rideId: ride._id.toString(),
-    cancelledBy: ride.cancelledBy!,
+  emitRideCancelled(updatedRide.rider.toString(), {
+    rideId: updatedRide._id.toString(),
+    cancelledBy: updatedRide.cancelledBy!,
   });
 
   await dispatchNextDriver(rideId);

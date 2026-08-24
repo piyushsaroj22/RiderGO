@@ -1,4 +1,5 @@
 import { HydratedDocument } from "mongoose";
+import AppError from "../utils/AppError.js";
 import RideModel from "../modules/ride/ride.model.js";
 import DriverModel, { Driver } from "../modules/driver/driver.model.js";
 import { findNearbyDrivers } from "./driverMatching.service.js";
@@ -14,6 +15,14 @@ const offerCurrentDriver = async (rideId: string) => {
 
   if (!ride) {
     throw new Error("Ride not found");
+  }
+
+  if (
+    ride.status !== "SEARCHING" ||
+    ride.dispatch.isDispatchCompleted ||
+    ride.driver
+  ) {
+    return;
   }
 
   if (ride.dispatch.currentDriverIndex >= ride.dispatch.queue.length) {
@@ -110,6 +119,14 @@ export const assignRideToDriver = async (
     throw new Error("Ride not found");
   }
 
+  if (ride.status !== "SEARCHING") {
+    throw new AppError("Ride is no longer available", 409);
+  }
+
+  if (ride.driver) {
+    throw new AppError("Ride already has a driver", 409);
+  }
+
   ride.driver = driverId;
   ride.status = "DRIVER_ASSIGNED";
 
@@ -123,28 +140,51 @@ export const assignRideToDriver = async (
 };
 
 export const dispatchNextDriver = async (rideId: string) => {
-  const ride = await RideModel.findById(rideId);
+  const ride = await RideModel.findOneAndUpdate(
+    {
+      _id: rideId,
+      status: "SEARCHING",
+      "dispatch.isDispatchCompleted": false,
+      "dispatch.isDispatchInProgress": false,
+    },
+    {
+      $set: {
+        "dispatch.isDispatchInProgress": true,
+      },
+    },
+    {
+      new: true,
+    },
+  );
 
+  // Another dispatch operation is already handling this ride
   if (!ride) {
-    throw new Error("Ride not found");
-  }
-
-  if (ride.dispatch.isDispatchCompleted) {
     return;
   }
 
-  ride.dispatch.currentDriverIndex++;
+  try {
+    const nextDriverIndex = ride.dispatch.currentDriverIndex + 1;
 
-  if (ride.dispatch.currentDriverIndex >= ride.dispatch.queue.length) {
-    ride.status = "NO_DRIVER_FOUND";
-    ride.dispatch.isDispatchCompleted = true;
+    if (nextDriverIndex >= ride.dispatch.queue.length) {
+      ride.status = "NO_DRIVER_FOUND";
+      ride.dispatch.isDispatchCompleted = true;
+      ride.dispatch.isDispatchInProgress = false;
+
+      await ride.save();
+
+      return;
+    }
+
+    ride.dispatch.currentDriverIndex = nextDriverIndex;
 
     await ride.save();
 
-    return;
+    await offerCurrentDriver(rideId);
+  } finally {
+    await RideModel.findByIdAndUpdate(rideId, {
+      $set: {
+        "dispatch.isDispatchInProgress": false,
+      },
+    });
   }
-
-  await ride.save();
-
-  await offerCurrentDriver(rideId);
 };

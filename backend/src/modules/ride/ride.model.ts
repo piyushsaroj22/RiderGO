@@ -43,6 +43,12 @@ const dispatchSchema = new Schema(
       default: false,
       required: true,
     },
+
+    isDispatchInProgress: {
+      type: Boolean,
+      default: false,
+      required: true,
+    },
   },
   {
     _id: false,
@@ -118,6 +124,7 @@ const rideSchema = new Schema(
         queue: [],
         currentDriverIndex: 0,
         isDispatchCompleted: false,
+        isDispatchInProgress: false,
       }),
     },
 
