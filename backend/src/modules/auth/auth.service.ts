@@ -7,9 +7,9 @@ import { setAuthCookie } from "../../utils/cookie.js";
 import EmailVerificationModel from "../emailVerification/emailVerification.model.js";
 import { sendVerificationEmail } from "../emailVerification/emailVerification.service.js";
 import { HydratedDocument } from "mongoose";
-import { GetCurrentUserResponse } from "./auth.types.js";
 import { User } from "../user/user.model.js";
 import DriverModel from "../driver/driver.model.js";
+
 import {
   RegisterUserInput,
   LoginUserInput,
@@ -17,7 +17,16 @@ import {
   VerifyUserEmailResponse,
   RegisterUserResponse,
   LogoutUserResponse,
+  GetCurrentUserResponse,
+  ResetPasswordResponse,
+  ForgotPasswordResponse,
 } from "./auth.types.js";
+
+import {
+  requestPasswordReset,
+  resetPassword,
+  type PasswordResetAccountType,
+} from "../passwordReset/passwordReset.service.js";
 
 export const registerUser = async ({
   name,
@@ -192,5 +201,30 @@ export const getCurrentUser = async (
       profileImage: user.profileImage,
       isEmailVerified: user.isEmailVerified,
     },
+  };
+};
+
+export const forgotPassword = async (
+  email: string,
+  accountType: PasswordResetAccountType,
+): Promise<ForgotPasswordResponse> => {
+  await requestPasswordReset(email, accountType);
+
+  return {
+    success: true,
+    message: "Password reset link has been sent.",
+  };
+};
+
+export const resetUserPassword = async (
+  token: string,
+  password: string,
+  accountType: PasswordResetAccountType,
+): Promise<ResetPasswordResponse> => {
+  await resetPassword(token, password, accountType);
+
+  return {
+    success: true,
+    message: "Password reset successfully.",
   };
 };

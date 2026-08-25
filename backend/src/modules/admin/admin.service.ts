@@ -9,6 +9,12 @@ import AdminModel from "./admin.model.js";
 import DriverModel, { Driver } from "../driver/driver.model.js";
 import { HydratedDocument } from "mongoose";
 import { Admin } from "./admin.model.js";
+import UserModel from "../user/user.model.js";
+import {
+  PasswordResetAccountType,
+  requestPasswordReset,
+  resetPassword,
+} from "../passwordReset/passwordReset.service.js";
 import {
   RegisterAdminInput,
   RegisterAdminResponse,
@@ -29,8 +35,9 @@ import {
   GetUsersResponse,
   BlockUserInput,
   UpdateUserBlockStatusResponse,
+  ResetPasswordResponse,
+  ForgotPasswordResponse,
 } from "./admin.types.js";
-import UserModel from "../user/user.model.js";
 
 export const registerAdmin = async (
   { fullName, email, password }: RegisterAdminInput,
@@ -552,5 +559,30 @@ export const updateUserBlockStatus = async (
     message: isBlocked
       ? "User blocked successfully."
       : "User unblocked successfully.",
+  };
+};
+
+export const forgotPassword = async (
+  email: string,
+  accountType: PasswordResetAccountType,
+): Promise<ForgotPasswordResponse> => {
+  await requestPasswordReset(email, accountType);
+
+  return {
+    success: true,
+    message: "Password reset link has been sent.",
+  };
+};
+
+export const resetUserPassword = async (
+  token: string,
+  password: string,
+  accountType: PasswordResetAccountType,
+): Promise<ResetPasswordResponse> => {
+  await resetPassword(token, password, accountType);
+
+  return {
+    success: true,
+    message: "Password reset successfully.",
   };
 };

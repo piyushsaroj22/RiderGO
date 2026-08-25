@@ -6,11 +6,20 @@ import DriverModel from "./driver.model.js";
 import AppError from "../../utils/AppError.js";
 import { generateToken } from "../../utils/jwt.js";
 import { setAuthCookie } from "../../utils/cookie.js";
-import { UpdateDriverImageResponse } from "./driver.types.js";
+import {
+  ForgotPasswordResponse,
+  ResetPasswordResponse,
+  UpdateDriverImageResponse,
+} from "./driver.types.js";
 // import { uploadImage, deleteImage } from "../../services/cloudinary.service.js";
 import { RegisterDriverInput, RegisterDriverResponse } from "./driver.types.js";
 import { sendVerificationEmail } from "../emailVerification/emailVerification.service.js";
 import { updateDriverImage } from "./driver.image.service.js";
+import {
+  PasswordResetAccountType,
+  requestPasswordReset,
+  resetPassword,
+} from "../passwordReset/passwordReset.service.js";
 import {
   GetCurrentDriverResponse,
   LoginDriverInput,
@@ -343,5 +352,30 @@ export const updateDriverLocation = async (
   return {
     success: true,
     message: "Location updated successfully",
+  };
+};
+
+export const forgotPassword = async (
+  email: string,
+  accountType: PasswordResetAccountType,
+): Promise<ForgotPasswordResponse> => {
+  await requestPasswordReset(email, accountType);
+
+  return {
+    success: true,
+    message: "Password reset link has been sent.",
+  };
+};
+
+export const resetUserPassword = async (
+  token: string,
+  password: string,
+  accountType: PasswordResetAccountType,
+): Promise<ResetPasswordResponse> => {
+  await resetPassword(token, password, accountType);
+
+  return {
+    success: true,
+    message: "Password reset successfully.",
   };
 };

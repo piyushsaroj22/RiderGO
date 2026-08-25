@@ -14,6 +14,8 @@ import {
   updateDriverBlockStatus,
   getUsers,
   updateUserBlockStatus,
+  resetUserPassword,
+  forgotPassword,
 } from "./admin.service.js";
 
 import {
@@ -38,6 +40,10 @@ import {
   GetUsersResponse,
   BlockUserInput,
   UpdateUserBlockStatusResponse,
+  ForgotPasswordResponse,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+  ResetPasswordResponse,
 } from "./admin.types.js";
 
 type DriverIdParams = {
@@ -239,6 +245,35 @@ export const unblockUserController = asyncHandler<
     req.params.userId,
     admin._id.toString(),
     false,
+  );
+
+  res.status(200).json(result);
+});
+
+type PasswordResetParams = {
+  token: string;
+  accountType: string;
+};
+
+export const forgotPasswordController = asyncHandler<
+  ParamsDictionary,
+  ForgotPasswordResponse,
+  ForgotPasswordInput
+>(async (req, res) => {
+  const result = await forgotPassword(req.body.email, "Admin");
+
+  res.status(200).json(result);
+});
+
+export const resetPasswordController = asyncHandler<
+  PasswordResetParams,
+  ResetPasswordResponse,
+  ResetPasswordInput
+>(async (req, res) => {
+  const result = await resetUserPassword(
+    req.params.token,
+    req.body.password,
+    "Admin",
   );
 
   res.status(200).json(result);

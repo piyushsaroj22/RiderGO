@@ -15,6 +15,8 @@ import {
   updateRcImage,
   updateVehicleImage,
   updateLocation,
+  forgotPasswordController,
+  resetPasswordController,
 } from "./driver.controller.js";
 
 const router = Router();
@@ -25,6 +27,8 @@ router.post("/logout", protectRoute, authorize(["Driver"]), logout);
 router.get("/me", protectRoute, authorize(["Driver"]), me);
 router.get("/profile", protectRoute, authorize(["Driver"]), getProfile);
 router.patch("/profile", protectRoute, authorize(["Driver"]), updateProfile);
+router.post("/forgot-password", forgotPasswordController);
+router.post("/reset-password/:token", resetPasswordController);
 
 router.patch(
   "/location",

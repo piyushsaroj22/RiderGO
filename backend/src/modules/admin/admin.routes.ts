@@ -22,6 +22,8 @@ import {
   getUsersController,
   blockUserController,
   unblockUserController,
+  forgotPasswordController,
+  resetPasswordController,
 } from "./admin.controller.js";
 
 const router = Router();
@@ -30,6 +32,8 @@ router.post("/register", register);
 router.post("/login", login);
 router.post("/logout", protectRoute, authorize(["Admin"]), logout);
 router.get("/me", protectRoute, authorize(["Admin"]), me);
+router.post("/forgot-password", forgotPasswordController);
+router.post("/reset-password/:token", resetPasswordController);
 
 router.get(
   "/drivers",

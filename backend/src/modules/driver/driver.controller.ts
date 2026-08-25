@@ -13,6 +13,8 @@ import {
   updateDriverRcImage,
   updateDriverVehicleImage,
   updateDriverLocation,
+  resetUserPassword,
+  forgotPassword,
 } from "./driver.service.js";
 
 import { ParamsDictionary } from "express-serve-static-core";
@@ -29,6 +31,10 @@ import {
   UpdateDriverImageResponse,
   UpdateDriverLocationInput,
   UpdateDriverLocationResponse,
+  ForgotPasswordResponse,
+  ForgotPasswordInput,
+  ResetPasswordInput,
+  ResetPasswordResponse,
 } from "./driver.types.js";
 
 export const register = asyncHandler<
@@ -152,6 +158,35 @@ export const updateLocation = asyncHandler<
   const result = await updateDriverLocation(
     req.account as HydratedDocument<Driver>,
     req.body,
+  );
+
+  res.status(200).json(result);
+});
+
+type PasswordResetParams = {
+  token: string;
+  accountType: string;
+};
+
+export const forgotPasswordController = asyncHandler<
+  ParamsDictionary,
+  ForgotPasswordResponse,
+  ForgotPasswordInput
+>(async (req, res) => {
+  const result = await forgotPassword(req.body.email, "Driver");
+
+  res.status(200).json(result);
+});
+
+export const resetPasswordController = asyncHandler<
+  PasswordResetParams,
+  ResetPasswordResponse,
+  ResetPasswordInput
+>(async (req, res) => {
+  const result = await resetUserPassword(
+    req.params.token,
+    req.body.password,
+    "Driver",
   );
 
   res.status(200).json(result);
