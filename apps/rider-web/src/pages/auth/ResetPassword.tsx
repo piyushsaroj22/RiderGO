@@ -2,6 +2,7 @@ import axios from "axios";
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link, useParams } from "react-router-dom";
+import { Eye, EyeOff } from "lucide-react";
 
 import { authApi } from "../../services/api/auth.api";
 
@@ -14,6 +15,9 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -112,36 +116,64 @@ const ResetPassword = () => {
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <div>
+            <div className="relative">
               <label htmlFor="password" className="sr-only">
                 New password
               </label>
 
               <input
                 id="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
                 placeholder="New password"
                 autoComplete="new-password"
-                className="h-14 w-full rounded-md border border-neutral-300 px-4 text-base text-black outline-none transition-colors placeholder:text-neutral-500 focus:border-black focus:ring-1 focus:ring-black"
+                className="h-14 w-full rounded-md border border-neutral-300 px-4 pr-12 text-base text-black outline-none transition-colors placeholder:text-neutral-500 focus:border-black focus:ring-1 focus:ring-black"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-neutral-500 hover:text-black"
+              >
+                {showPassword ? (
+                  <EyeOff size={20} strokeWidth={1.8} />
+                ) : (
+                  <Eye size={20} strokeWidth={1.8} />
+                )}
+              </button>
             </div>
 
-            <div>
+            <div className="relative">
               <label htmlFor="confirmPassword" className="sr-only">
                 Confirm password
               </label>
 
               <input
                 id="confirmPassword"
-                type="password"
+                type={showConfirmPassword ? "text" : "password"}
                 value={confirmPassword}
                 onChange={(event) => setConfirmPassword(event.target.value)}
                 placeholder="Confirm password"
                 autoComplete="new-password"
-                className="h-14 w-full rounded-md border border-neutral-300 px-4 text-base text-black outline-none transition-colors placeholder:text-neutral-500 focus:border-black focus:ring-1 focus:ring-black"
+                className="h-14 w-full rounded-md border border-neutral-300 px-4 pr-12 text-base text-black outline-none transition-colors placeholder:text-neutral-500 focus:border-black focus:ring-1 focus:ring-black"
               />
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword((prev) => !prev)}
+                aria-label={
+                  showConfirmPassword
+                    ? "Hide confirm password"
+                    : "Show confirm password"
+                }
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-neutral-500 hover:text-black"
+              >
+                {showConfirmPassword ? (
+                  <EyeOff size={20} strokeWidth={1.8} />
+                ) : (
+                  <Eye size={20} strokeWidth={1.8} />
+                )}
+              </button>
             </div>
 
             {error && (
